@@ -1,10 +1,10 @@
 Implementation: for BitChute.com video pre-processing and possibly more (depending on how much time I have outside the native android app)
-(see bottom for original readme)
 
-app.by( Ray Vahey, Rich Jones [@BitChute]
-Hexagod {
-channel = bitchute.com/channel/hexagod
-});
+app.by(@BitChute => {Ray Vahey && Rich Jones} +
+Hexagod => {
+channel = bitchute.com/channel/hexagod // OU: vybemasterz ent
+} + (Snippet && Template contributors (see below as this will grow over time!))
+)}
 
 To get started:
 1.) clone the repo
@@ -16,7 +16,11 @@ To get started:
 
 Repo locations: 
 https://gitlab.com/BitChute/bitchuteuploader (Ray Official)
-https://github.com/hexag0d/BitChute_Desktop_ElectronJS (Hexagod backup)
+https://github.com/hexag0d/BitChute_Desktop_ElectronJS (GitHub backup)
 https://gitlab.com/hexagod/bitchuteuploader (Hexagod fork)
 
-I (hexagod) am not responsible for any of the content which user posts using this app.  I cannot control what people post with this app.  Everything I do for BitChute is opensource, part of this is so anyone can audit and see I have no control over the posting.
+Contributors to this repo are not responsible for any of the content which the end user posts using this app.
+Devs cannot control what people post with this app.
+
+Special thanks to (give these people follows thanks etc):
+https://github.com/likethemammal for the ffmpeg integration template!  
