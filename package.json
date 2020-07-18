@@ -1,0 +1,23 @@
+{
+  "name": "@likethemammal/electron-ffmpeg-example",
+  "version": "0.1.0",
+  "description": "Example of a Electron quick start with ffmpeg hooked up",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/likethemammal/electron/ffmpeg/example",
+  "keywords": [
+    "electron",
+    "ffmpeg"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^1.7.16"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}
