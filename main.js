@@ -1,9 +1,11 @@
 
 const electron = require('electron')
+var { Menu } = require('electron')
 // Module to control application life.
-const app = electron.app
+var app = electron.app
+//var menu = Menu.buildFromTemplate()
 // Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
+var BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
@@ -26,13 +28,14 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-    mainWindow = new BrowserWindow({
+    var mainWindow = new BrowserWindow({
         width: 800, height: 600, webPreferences: {
             nodeIntegration: true
             ,
             //enableRemoteModule: true
         }
     })
+    mainWindow.setMenuBarVisibility(false)
     
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -41,7 +44,7 @@ function createWindow () {
     slashes: true
     }))
   // Open the DevTools.
-    //mainWindow.webContents.openDevTools()  // @DEBUG
+    mainWindow.webContents.openDevTools()  // @DEBUG
     mainWindow.setBackgroundColor('black')
     
   // Emitted when the window is closed.
@@ -80,9 +83,10 @@ app.on('activate', function () {
     const ipc = require('electron').ipcMain
 
     ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
-        console.log(filePath)
+        console.log(filePath);
+        var { extt, namee, dirr } = path.parse(filePath); 
+        $('#debugAreaText')[0].value = (ext.toString() + "  " + name.toString() + "   " + dir.toString());
         try {
-            const { ext, name, dir } = path.parse(filePath)
             var rndId = Math.floor((Math.random() * 1000000) + 1);
             const proc = ffmpeg(filePath)
                 .on('codecData', function (data) {
@@ -100,7 +104,7 @@ app.on('activate', function () {
                 .size('854x480')
                 .audioBitrate('96k')
                 .videoBitrate('213k')
-                .save(`${dir}/${name}_${rndId}${ext}`)
+                .save(`${dirr}/${namee}_${rndId}${extt}`)
         } catch (error) {
             alert(error)
         }

@@ -15,6 +15,9 @@ To get started:
 6.) npm i custom-electron-titlebar
 7.) npm start
 
+optional
+--??? npm outdated
+--??? npm install electron@latest -g --save
 
 Repo locations: 
 https://gitlab.com/BitChute/bitchuteuploader (Ray Official)

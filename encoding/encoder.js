@@ -1,4 +1,4 @@
-export function uEncodeVideos(paths) {
+function uEncodeVideos(paths) {
     console.log(paths)
     try {
         const { ext, name, dir } = path.parse(paths)
