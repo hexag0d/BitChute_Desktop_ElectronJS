@@ -6,7 +6,6 @@
     <title>BitChute for Desktop</title>
 </head>
 <body style="background-color:black; color:lawngreen">
-
     <h1>
         <img alt="" src="rsrc\signage\logo_bronze.png" />.ElectronJS a.001
         <input id="debugAreaText" type="text" style="justify-content:flex-end"/></h1>
@@ -57,5 +56,18 @@
     </script>
     <script type="text/javascript" src="ui/uploadButton.js"></script>
     <script type="text/javascript" src="ui/filechooser.js"></script>
+    <script type="text/javascript">
+const customTitlebar = require('custom-electron-titlebar');
+new customTitlebar.Titlebar({
+    backgroundColor: customTitlebar.Color.BLACK  
+});
+customTitlebar.updateItemBGColor(new Color(new RGBA(0, 0, 0, .7)))
+titlebar.updateBackground(new Color(new RGBA(0, 0, 0, .7)));
+titlebar.updateItemBGColor(new Color(new RGBA(0, 0, 0, .7)));
+menubar.updateBackground(new Color(new RGBA(0, 0, 0, .7)));
+    </script>
 </body>
 </html>
+<!--new customTitlebar.Titlebar({
+    backgroundColor: customTitlebar.Color.BLACK  
+});-->

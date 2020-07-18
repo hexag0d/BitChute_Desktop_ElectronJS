@@ -3,6 +3,8 @@ const dialog = electron.remote.dialog;
 uploadButton = document.getElementById('uploadButton');
 fileChooser = document.getElementById('videoInput');
 
+
+
 var sendVid = function () {
     console.log(fileChooser.files[0].path);
     ipc.send(event_keys.GET_INPUT_PATH, fileChooser.files[0].path)
@@ -60,6 +62,7 @@ $('#videoInput')[0].onmousedown = fileChooserOnClick;
 //const electron = require('electron');
 //const path = require('path');
 //// Importing dialog module using remote 
+//const dialog = electron.remote.dialog;
 //const dialog = electron.remote.dialog;
 //const { event_keys } = require('./constants');
 //const ipc = electron.ipcRenderer;

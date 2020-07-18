@@ -9,9 +9,11 @@ channel = bitchute.com/channel/hexagod // OU: vybemasterz ent
 To get started:
 1.) clone the repo
 2.) open command prompt and cd to your repo root then run the following commands:
-3.) run npm install --save-dev electron
-4.) run npm install fluent-ffmpeg@2.1.2
-5.) npm start
+3.) npm install --save-dev electron
+4.) npm install fluent-ffmpeg@2.1.2
+5.) npm install jquery --save
+6.) npm i custom-electron-titlebar
+7.) npm start
 
 
 Repo locations: 
