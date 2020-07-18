@@ -14,7 +14,7 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^1.7.16"
+    "electron": "^9.1.0"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
