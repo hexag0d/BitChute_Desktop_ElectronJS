@@ -3,7 +3,7 @@
 // All of the Node.js APIs are available in this process.
 
 const { event_keys } = require('./constants')
-
+window.$ = window.jQuery = require('jquery');
 const ipc = require('electron').ipcRenderer
 
 const asyncMsgBtn = document.getElementById('async-msg')

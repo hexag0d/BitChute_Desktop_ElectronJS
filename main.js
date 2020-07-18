@@ -17,24 +17,30 @@ const encodesettings = require('./encoding/settings');
 
 const { event_keys } = require('./constants')
 
+
+
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+    mainWindow = new BrowserWindow({
+        width: 800, height: 600, webPreferences: {
+            nodeIntegration: true,
+            //enableRemoteModule: true
+        }})
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
-  }))
-
+    }))
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()  // @DEBUG
-
+    //mainWindow.webContents.openDevTools()  // @DEBUG
+    mainWindow.setBackgroundColor('black')
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
@@ -65,13 +71,35 @@ app.on('activate', function () {
   }
 })
 
+
+if (process.platform == 'darwin') {
+    const { systemPreferences } = remote
+
+    const setOSTheme = () => {
+        let theme = systemPreferences.isDarkMode() ? 'dark' : 'light'
+        window.localStorage.os_theme = theme
+
+        //
+        // Defined in index.html, so undefined when launching the app.
+        // Will be defined for `systemPreferences.subscribeNotification` callback.
+        //
+        if ('__setTheme' in window) {
+            window.__setTheme()
+        }
+    }
+
+    systemPreferences.subscribeNotification(
+        'AppleInterfaceThemeChangedNotification',
+        setOSTheme,
+    )
+
+    setOSTheme()
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
 
 const ipc = require('electron').ipcMain
-
-// const path = require('path')
 
 
  ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
