@@ -1,11 +1,9 @@
 
 const electron = require('electron')
-var { Menu } = require('electron')
 // Module to control application life.
-var app = electron.app
-//var menu = Menu.buildFromTemplate()
+const app = electron.app
 // Module to create native browser window.
-var BrowserWindow = electron.BrowserWindow
+const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
@@ -19,34 +17,24 @@ const encodesettings = require('./encoding/settings');
 
 const { event_keys } = require('./constants')
 
-
-
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow () {
   // Create the browser window.
-    var mainWindow = new BrowserWindow({
-        width: 800, height: 600, webPreferences: {
-            nodeIntegration: true
-            ,
-            //enableRemoteModule: true
-        }
-    })
-    mainWindow.setMenuBarVisibility(false)
-    
+  mainWindow = new BrowserWindow({width: 800, height: 600})
+
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
-    }))
+  }))
+
   // Open the DevTools.
-    mainWindow.webContents.openDevTools()  // @DEBUG
-    mainWindow.setBackgroundColor('black')
-    
+  //mainWindow.webContents.openDevTools()  // @DEBUG
+
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
@@ -77,35 +65,40 @@ app.on('activate', function () {
   }
 })
 
-    // In this file you can include the rest of your app's specific main process
-    // code. You can also put them in separate files and require them here.
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
 
-    const ipc = require('electron').ipcMain
 
-    ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
-        console.log(filePath);
-        var { extt, namee, dirr } = path.parse(filePath); 
-        $('#debugAreaText')[0].value = (ext.toString() + "  " + name.toString() + "   " + dir.toString());
-        try {
-            var rndId = Math.floor((Math.random() * 1000000) + 1);
-            const proc = ffmpeg(filePath)
-                .on('codecData', function (data) {
-                    console.log(data);
-                })
-                .on('end', function () {
-                    console.log('file has been converted succesfully');
-                })
-                .on('error', function (err) {
-                    console.log('an error happened: ' + err.message);
-                })
-                .on('progress', function ({ percent }) {
-                    console.log('progress percent: ' + percent);
-                })
-                .size('854x480')
-                .audioBitrate('96k')
-                .videoBitrate('213k')
-                .save(`${dirr}/${namee}_${rndId}${extt}`)
-        } catch (error) {
-            alert(error)
-        }
-    })
+const ipc = require('electron').ipcMain
+
+// const path = require('path')
+
+
+ ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
+
+     console.log(filePath)
+     try {
+         const { ext, name, dir } = path.parse(filePath)
+         var rndId = Math.floor((Math.random() * 1000000) + 1);
+         const proc = ffmpeg(filePath)
+
+             .on('codecData', function(data) {
+                 console.log(data);
+             })
+             .on('end', function() {
+                 console.log('file has been converted succesfully');
+             })
+             .on('error', function(err) {
+                 console.log('an error happened: ' + err.message);
+             })
+             .on('progress', function({ percent }) {
+                 console.log('progress percent: ' + percent);
+             })
+             .size('854x480')
+             .audioBitrate('96k')
+             .videoBitrate('213k')
+             .save(`${dir}/${name}_${rndId}${ext}`)
+     } catch (error) {
+         alert(error)
+     }
+ })

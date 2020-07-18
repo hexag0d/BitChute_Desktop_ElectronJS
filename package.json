@@ -14,12 +14,10 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^7.3.2"
+    "electron": "^1.7.16"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
-    "custom-electron-titlebar": "^3.2.3",
-    "fluent-ffmpeg": "^2.1.2",
-    "jquery": "^3.5.1"
+    "fluent-ffmpeg": "^2.1.2"
   }
 }
