@@ -73,6 +73,8 @@ const ipc = require('electron').ipcMain
 
 // const path = require('path')
 
+//debugStatusTextBox = document.getElementById('DebugStatusTextBox');
+
 
  ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
      console.log(filePath)
@@ -82,6 +84,7 @@ const ipc = require('electron').ipcMain
          const proc = ffmpeg(filePath)
              .on('codecData', function(data) {
                  console.log(data);
+                 //debugStatusTextBox.
              })
              .on('end', function() {
                  console.log('file has been converted succesfully');

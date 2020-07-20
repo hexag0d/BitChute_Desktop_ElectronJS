@@ -11,3 +11,8 @@ h1 {
 input {
     background:grey;
 }
+
+textarea {
+    color: white;
+    background:black;
+}

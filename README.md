@@ -1,9 +1,11 @@
 Implementation: for BitChute.com video pre-processing and possibly more
-(see bottom for original readme)
 
 app.by( @bitchute = { Ray Vahey, Rich Jones }
 @hexagod {
 channel = bitchute.com/channel/hexagod 
+twitter = @vybeypantelonez
+minds = @hexagod
+gab.ai = @hexagod
 }); // + see below
 
 To get started:

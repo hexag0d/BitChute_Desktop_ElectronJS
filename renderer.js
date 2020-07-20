@@ -5,6 +5,7 @@
 const { event_keys } = require('./constants')
 
 const ipc = require('electron').ipcRenderer
+window.$ = window.jQuery = require('jquery');
 
 const asyncMsgBtn = document.getElementById('async-msg')
 
