@@ -7,19 +7,19 @@
 
 //bitchute.com settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-token = 'test'; 
+//token = 'test'; I don't think we should store the token
 
 // end bitchute settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 //begin axios settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-axiosConfig = {
-    headers: {
-        'Content-Type' : 'multipart/form-data',
-        Authorization: `Bearer ${global.token}`,
-        //"Access-Control-Allow-Origin": "*",
-    }
-}
+//moving this for now @TODO
+//axiosConfig = {
+//    headers: {
+//        'Content-Type' : 'multipart/form-data',
+//        Authorization: `Bearer ${global.token}`,
+//        //"Access-Control-Allow-Origin": "*",
+//    }
+//}
 
 //end axios settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

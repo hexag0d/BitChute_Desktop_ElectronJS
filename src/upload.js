@@ -11,6 +11,7 @@ const dialog = electron.remote.dialog;
 //ui
 var chooseFileButton = document.getElementById('ChooseFile');
 var uploadFileButton = document.getElementById('UploadButton');
+var authTokenTextBox = document.getElementById('')
 
 global.filepath = undefined;
 
@@ -27,6 +28,17 @@ uploadFileButton.addEventListener('click', () => {
     global.debugStatusTextBox[0].value = global.axiosConfig.headers.Authorization.toString();
     //global.debugStatusTextBox[0].value = 'test';
 })
+
+function getAxiosHeaders() {
+    
+    axiosConfig = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${global.token}`,
+            //"Access-Control-Allow-Origin": "*",
+        }
+    }
+}
 
 function postVideoData(localDataPath, authToken, cookies, url) {
     var formData = new FormData();
