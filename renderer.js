@@ -22,10 +22,12 @@ ipc.on('asynchronous-reply', function (event, arg) {
 const { dialog } = require('electron').remote
 // console.log(dialog)
 
-dialog.showOpenDialog({properties: ['openFile']}, function (paths) {
-    console.log(paths)
-    global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
-    ipc.send(event_keys.GET_INPUT_PATH, paths[0])
+dialog.showOpenDialog({ properties: ['openFile'] }, function (paths) {
+    try {
+        console.log(paths)
+        global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
+        ipc.send(event_keys.GET_INPUT_PATH, paths[0])
+    } catch (e) { }
 })
 
 ipc.on('write-to-console', (event, ...args) => {

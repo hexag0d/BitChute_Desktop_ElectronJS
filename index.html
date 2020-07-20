@@ -27,25 +27,20 @@
           <textarea id="DebugStatusTextBox" name="text" rows="12" cols="50"></textarea>
       <p>
           <input id="UploadButton" type="button" value="Upload" /><input id="ProcessedFileLink" type="text" /></p>
-      <div style="height: 262px; width: 568px; margin-left: 0px; margin-bottom: 0px;border:1px solid grey;">
-          Debugging tools<br />
-          <br />
+      <div style="height: 309px; width: 568px; margin-left: 0px; margin-bottom: 0px;border: solid grey">
+          Debugging tools (advanced users only):<br />
           Auth Token:&nbsp;&nbsp;
           <input id="AuthTokenTextBox" type="password"/>&nbsp; &lt;&lt; be careful where you POST<br />
           Endpoint POST url:
-          <input id="EndpointUrlTextBox" type="text" /> &lt;&lt;<br />
-          <br />
-          Https Diag:<br />
-          <textarea id="HttpsDiagnosticTextBox" name="text" rows="6" cols="50" style="display:inline-flex"></textarea></div>
-      <p>
-          &nbsp;</p>
-      <p>
-          &nbsp;</p>
-      <p>
-          &nbsp;</p>
-      <p>
-          &nbsp;
+          <input id="EndpointUrlTextBox" type="text" value="https://bitchute.com/myupload/"/> &lt;&lt;<br />
+          Manual Cookie:
+          <textarea id="CookieTextBox" rows="2"></textarea><br/>
 
+          Https Diag:<br />
+          <textarea id="HttpsDiagnosticTextBox" name="text" style="display:inline-flex; height: 128px;"></textarea>
+              </div>
+      <p>
+          This app is designed to lighten the load on bitchute.com remote server processing.  By @hexagod, Ray Vahey & template by @likethemammal 
       </p>
       <div style="position:relative;align-items:flex-end;">
           using Node.js <script>document.write(process.versions.node)</script>,
