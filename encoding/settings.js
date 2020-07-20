@@ -1,3 +1,13 @@
-var resolution = '854x480';
-var newAudioBitrate = '96k';
-var videoBitrate = '213k';
+/*
+ * Global settings
+ * 
+ * 
+ */
+
+//begin video settings -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+videoEncoderSettingResolution = '854x480';
+videoEncoderSettingAudioBitrate = '96k';
+videoEncoderSettingVideoBitrate = '213k';
+
+//end video settings  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

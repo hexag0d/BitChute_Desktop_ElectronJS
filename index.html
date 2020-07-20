@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>BitChute File Encoder</title>
       <link rel="stylesheet" href="css/global.css">
   </head>
   <body>
@@ -13,7 +13,7 @@
 
     <div id="async-msg">Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
-      <input id="videoInput" type="file" disabled="disabled" />
+      <button id="uploadFile">video to encode</button>
 
     <!-- All of the Node.js APIs are available in this renderer process. -->
       <p>
@@ -46,5 +46,6 @@
       // You can also require other files to run in this process
       require('./renderer.js')
     </script>
+       <script src="index.js"></script> 
   </body>
 </html>
