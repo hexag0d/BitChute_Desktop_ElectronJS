@@ -13,11 +13,11 @@
 
     <div id="async-msg">Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
-      <button id="uploadFile">video to encode</button>
+      <button id="upload">video to encode</button>
 
     <!-- All of the Node.js APIs are available in this renderer process. -->
       <p>
-          &nbsp;</p>
+          <input id="DebugStatusTextBox" type="text"/>
       <p>
           &nbsp;</p>
       <p>
@@ -46,6 +46,6 @@
       // You can also require other files to run in this process
       require('./renderer.js')
     </script>
-       <script src="index.js"></script> 
+       <script src="src/upload.js"></script> 
   </body>
 </html>

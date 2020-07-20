@@ -22,8 +22,8 @@ uploadFile.addEventListener('click', () => {
             // Restricting the user to only Text Files. 
             filters: [
                 {
-                    name: 'Text Files',
-                    extensions: ['txt', 'docx']
+                    name: 'Video Files',
+                    extensions: ['avi', 'mp4', '*.*']
                 },],
             // Specifying the File Selector Property 
             properties: ['openFile']
