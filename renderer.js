@@ -33,6 +33,10 @@ ipc.on('write-to-console', (event, ...args) => {
     //event.sender.send('sum-reply', [...args].reduce(add, 0))
 })
 
+ipc.on('forward-file', (event, ...args) => {
+    global.processedFileTextBox[0].value += ([...args].toString() + '\n');
+})
+
 //ipc.on('write-to-console-with-callback', (event, ...args) => {
 //    global.debugStatusTextBox[0].value += [...args].reduce(add, 0).toString();
 //    //event.sender.send('sum-reply', [...args].reduce(add, 0))

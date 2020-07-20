@@ -1,25 +1,34 @@
-
-const electron = require('electron');
+//framework
+const electron = require('electron')
 const path = require('path');
-
 const fs = require('fs');
 const axios = require('axios');
 
 const { event_keys } = require('./constants')
 const ipc = require('electron').ipcRenderer
-
 const dialog = electron.remote.dialog;
 
-var chooseFile = document.getElementById('ChooseFile');
-
+//ui
+var chooseFileButton = document.getElementById('ChooseFile');
+var uploadFileButton = document.getElementById('UploadButton');
 
 global.filepath = undefined;
 
-window.writeToConsole = function (t) {
-    debugStatusTextBox[0].value += (t + '\n'); 
-}
 
-if (global.filepath && !file.canceled) {
+chooseFileButton.addEventListener('click', () => {
+    dialog.showOpenDialog({ properties: ['openFile'] }, function (paths) {
+        console.log(paths)
+        global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
+        ipc.send(event_keys.GET_INPUT_PATH, paths[0]);
+    })
+})
+
+uploadFileButton.addEventListener('click', () => {
+    global.debugStatusTextBox[0].value = global.axiosConfig.headers.Authorization.toString();
+    //global.debugStatusTextBox[0].value = 'test';
+})
+
+function postVideoData(localDataPath, authToken, cookies, url) {
     var formData = new FormData();
     formData.append('file', fs.createReadStream(global.filepath));
     axios.post('[Custom URL]', formData, {
@@ -28,14 +37,16 @@ if (global.filepath && !file.canceled) {
         }
     });
 }
-chooseFile.addEventListener('click', () => {
-    dialog.showOpenDialog({ properties: ['openFile'] }, function (paths) {
-        console.log(paths)
-        global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
-        ipc.send(event_keys.GET_INPUT_PATH, paths[0]);
-    })
-})
 
+//if (global.filepath && !file.canceled) {
+//    var formData = new FormData();
+//    formData.append('file', fs.createReadStream(global.filepath));
+//    axios.post('[Custom URL]', formData, {
+//        headers: {
+//            'Content-Type': 'multipart/form-data'
+//        }
+//    });
+//}
 //uploadFile.addEventListener('click', () => {
 //    // If the platform is 'win32' or 'Linux' 
 //    if (process.platform !== 'darwin') {

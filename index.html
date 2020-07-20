@@ -17,21 +17,14 @@
       <button id="ChooseFile">video to encode</button>
 
     <!-- All of the Node.js APIs are available in this renderer process. -->
-      <input type="text" id="FileToEncode"></input>
+      <input type="text" id="FileToEncode"/>
       <p>
           <textarea id="DebugStatusTextBox" name="text" rows="12" cols="50"></textarea>
       <p>
-          <!-- temporarily adding this button
-              but eventually we want to automatically send the file
-              after it gets processed so the user doesn't have have to sit at their computer
-              waiting for it to finish 
-              
-              It also might be useful to keep this button in-case advanced users want to 
-              pre-process the video in their own software and use this app to upload with 
-              their BitChute token
-
-              -->
-          <input id="UploadButton" type="button" value="Upload" /><input id="Text1" type="text" /></p>
+          <input id="UploadButton" type="button" value="Upload" /><input id="ProcessedFileLink" type="text" /></p>
+      <div style="height: 262px; width: 568px; margin-left: 0px; margin-bottom: 0px">
+          Debugging tools<br />
+      </div>
       <p>
           &nbsp;</p>
       <p>
@@ -58,8 +51,8 @@
       // You can also require other files to run in this process
       require('./renderer.js')
     </script>
-       <script src="src/upload.js"></script> 
       <script src="src/index.js"></script>
-      <script src="main.js"></script>
+      <script src="settings.js"></script>
+       <script src="src/upload.js"></script> 
   </body>
 </html>

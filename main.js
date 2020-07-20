@@ -19,6 +19,7 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 const { event_keys } = require('./constants')
 
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -26,7 +27,6 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
-    global.mainWinGlo = mainWindow;
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
@@ -93,19 +93,21 @@ ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
                  console.log('file has been converted succesfully');
                  var newPath = `${dir}/${name}_${rndId}${ext}`;
                  mainWindow.webContents.send('write-to-console', 'processing finished @ : ' + newPath);
+                 mainWindow.webContents.send('forward-file', newPath);
              })
              .on('error', function(err) {
                  console.log('an error happened: ' + err.message);
-                 
+                 mainWindow.webContents.send('write-to-console', 'error @ : ' + err.message);
              })
              .on('progress', function({ percent }) {
                  console.log('progress percent: ' + percent);
              })
-             .size('854x480')
+             .size('854x480') 
              .audioBitrate('96k')
              .videoBitrate('213k')
              .save(`${dir}/${name}_${rndId}${ext}`)
      } catch (error) {
-         alert(error)
+         mainWindow.webContents.send('write-to-console', error.message);
+         alert(error);
      }
  })
