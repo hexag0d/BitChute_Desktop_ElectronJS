@@ -14,13 +14,24 @@
 
     <div id="async-msg">Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
-      <button id="upload">video to encode</button>
+      <button id="ChooseFile">video to encode</button>
 
     <!-- All of the Node.js APIs are available in this renderer process. -->
+      <input type="text" id="FileToEncode"></input>
       <p>
           <textarea id="DebugStatusTextBox" name="text" rows="12" cols="50"></textarea>
       <p>
-          &nbsp;</p>
+          <!-- temporarily adding this button
+              but eventually we want to automatically send the file
+              after it gets processed so the user doesn't have have to sit at their computer
+              waiting for it to finish 
+              
+              It also might be useful to keep this button in-case advanced users want to 
+              pre-process the video in their own software and use this app to upload with 
+              their BitChute token
+
+              -->
+          <input id="UploadButton" type="button" value="Upload" /><input id="Text1" type="text" /></p>
       <p>
           &nbsp;</p>
       <p>
@@ -37,7 +48,7 @@
           &nbsp;
 
       </p>
-      <div style="position:relative;align-items:flex-end">
+      <div style="position:relative;align-items:flex-end;">
           using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
@@ -48,5 +59,7 @@
       require('./renderer.js')
     </script>
        <script src="src/upload.js"></script> 
+      <script src="src/index.js"></script>
+      <script src="main.js"></script>
   </body>
 </html>

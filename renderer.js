@@ -16,7 +16,7 @@ asyncMsgBtn.addEventListener('click', function () {
 ipc.on('asynchronous-reply', function (event, arg) {
     const message = `Asynchronous message reply: ${arg}`
     console.log(message)
-
+    global.debugStatusTextBox[0].value += message;
 })
 
 const { dialog } = require('electron').remote
@@ -24,7 +24,16 @@ const { dialog } = require('electron').remote
 
 dialog.showOpenDialog({properties: ['openFile']}, function (paths) {
     console.log(paths)
-
+    global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
     ipc.send(event_keys.GET_INPUT_PATH, paths[0])
-
 })
+
+ipc.on('write-to-console', (event, ...args) => {
+    global.debugStatusTextBox[0].value += ([...args].toString() + '\n');
+    //event.sender.send('sum-reply', [...args].reduce(add, 0))
+})
+
+//ipc.on('write-to-console-with-callback', (event, ...args) => {
+//    global.debugStatusTextBox[0].value += [...args].reduce(add, 0).toString();
+//    //event.sender.send('sum-reply', [...args].reduce(add, 0))
+//})

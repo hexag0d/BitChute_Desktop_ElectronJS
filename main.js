@@ -1,3 +1,7 @@
+/*
+ * This file contains methods related to general app events
+ * also contains mainWindow methods
+ */
 
 const electron = require('electron')
 // Module to control application life.
@@ -13,8 +17,6 @@ const ffmpeg = require('fluent-ffmpeg')
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const encodesettings = require('./encoding/settings');
-
 const { event_keys } = require('./constants')
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -24,17 +26,16 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
-
+    global.mainWinGlo = mainWindow;
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
-
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()  // @DEBUG
-
+    //mainWindow.webContents.openDevTools()  // @DEBUG
+    
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
@@ -65,6 +66,7 @@ app.on('activate', function () {
   }
 })
 
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
@@ -76,7 +78,8 @@ const ipc = require('electron').ipcMain
 //debugStatusTextBox = document.getElementById('DebugStatusTextBox');
 
 
- ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
+ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
+    mainWindow.webContents.send('write-to-console', 'processing started..');
      console.log(filePath)
      try {
          const { ext, name, dir } = path.parse(filePath)
@@ -88,9 +91,12 @@ const ipc = require('electron').ipcMain
              })
              .on('end', function() {
                  console.log('file has been converted succesfully');
+                 var newPath = `${dir}/${name}_${rndId}${ext}`;
+                 mainWindow.webContents.send('write-to-console', 'processing finished @ : ' + newPath);
              })
              .on('error', function(err) {
                  console.log('an error happened: ' + err.message);
+                 
              })
              .on('progress', function({ percent }) {
                  console.log('progress percent: ' + percent);
