@@ -8,13 +8,11 @@ const axios = require('axios');
 const { event_keys } = require('./constants')
 const ipc = require('electron').ipcRenderer
 
-// Importing dialog module using remote 
 const dialog = electron.remote.dialog;
 
-var uploadFile = document.getElementById('ChooseFile');
+var chooseFile = document.getElementById('ChooseFile');
 
-// Defining a Global file path Variable to store  
-// user-selected file 
+
 global.filepath = undefined;
 
 window.writeToConsole = function (t) {
@@ -29,8 +27,8 @@ if (global.filepath && !file.canceled) {
             'Content-Type': 'multipart/form-data'
         }
     });
-}  
-uploadFile.addEventListener('click', () => {
+}
+chooseFile.addEventListener('click', () => {
     dialog.showOpenDialog({ properties: ['openFile'] }, function (paths) {
         console.log(paths)
         global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
