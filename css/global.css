@@ -2,6 +2,7 @@ body {
     background: black;
     font: 18px Arial, sans-serif;
     color: white;
+    height: 706px;
 }
 
 h1 {
@@ -9,10 +10,27 @@ h1 {
 }
 
 input {
-    background:grey;
+    width: 175px;
 }
 
 textarea {
     color: white;
     background:black;
+    width: 545px;
 }
+
+.float-container {
+    padding: 5px;
+}
+
+.MainColumnLeft {
+    width: 45%;
+    float: left;
+    padding: 20px;
+}
+
+.MainColumnRight {
+    width: 45%;
+    float: left;
+    padding: 20px;
+}  

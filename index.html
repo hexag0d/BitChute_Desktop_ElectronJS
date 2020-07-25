@@ -12,7 +12,11 @@
       </style>
   </head>
   <body>
-    <h1>
+<div class="float-container">
+
+  <div class="MainColumnLeft">
+    <div class="VideoOptionDiv"></div>
+          <h1>
         <img alt="" src="rsrc\signage\logo_bronze.png" />.ElectronJS a.001 </h1>
       
     <!--<input type="file" accept="video/mp4" />-->
@@ -37,16 +41,9 @@
           <textarea id="CookieTextBox" rows="2"></textarea><br/>
 
           Https Diag:<br />
-          <textarea id="HttpsDiagnosticTextBox" name="text" style="display:inline-flex; height: 128px;"></textarea>
+          <textarea id="HttpsDiagnosticTextBox" name="text" style="height: 20%; width:100%"></textarea>
               </div>
-      <p>
-          This app is designed to lighten the load on bitchute.com remote server processing.  By @hexagod, Ray Vahey & template by @likethemammal 
-      </p>
-      <div style="position:relative;align-items:flex-end;">
-          using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-              
+
       </div>
     <script>
       // You can also require other files to run in this process
@@ -55,5 +52,27 @@
       <script src="src/index.js"></script>
       <script src="settings.js"></script>
        <script src="src/upload.js"></script> 
+  
+  <div class="MainColumnRight">
+    <div class="MetaOptionDiv">
+        <div style="height:100%">
+
+            <br />
+            <br />
+            <br />
+            <br />
+            Title<br />
+            <input id="Text1" type="text" style="width:100%" /><br />
+            Description<br />
+            <textarea id="TextArea1" cols="20" name="S1" rows="6"></textarea><br />
+            <div style="max-width:100%;max-height:100%">
+            <img alt="" src="rsrc/examples/CURE2.png" style="width:100%;object-fit:contain" /><br />
+            </div>
+            <br />
+            <input id="ChooseImageButton" type="button" value="choose a thumbnail" /><input id="ThumbnailSourceText" type="text" /></div>
+     </div>
+  </div>
+  
+</div>
   </body>
 </html>
