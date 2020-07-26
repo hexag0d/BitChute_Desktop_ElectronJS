@@ -1,16 +1,11 @@
 //framework
-const electron = require('electron')
-const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
 
 const { event_keys } = require('./constants')
-const ipc = require('electron').ipcRenderer
-const dialog = electron.remote.dialog;
+//const { file_chooser } = require('./src/filechooser')
 
 //ui
-chooseVideoFileButton = document.getElementById('ChooseVideoFile');
-chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
 uploadFileButton = document.getElementById('UploadVideoButton');
 uploadThumbnailButton = document.getElementById('');
 
@@ -20,32 +15,10 @@ thumbnailSourceTextBox = document.getElementById('ThumbnailSourceText');
 
 processedFileTextBox = document.getElementById('ProcessedFileLink');
 
-$(document).ready(() => {
-    chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
-    chooseThumbnailButton.addEventListener('click', chooseThumbnailOnClick());
-})
-//event_keys.GET_VIDEO_INPUT_PATH
-chooseVideoFileButton.addEventListener('click', () => {
-    file_chooser.showXPlatformChooser(null, null, 'inputPath');
-})
-
-chooseThumbnailButton.addEventListener('click', () => {
-        file_chooser.showXPlatformChooser(null, null, thumbnailSourceTextBox);
-        thumbnailSourceTextBox.value = paths[0]; // just one for now, but eventually want ability to mass upload
-})
-
-function chooseThumbnailOnClick() {
-    var paths = file_chooser.showXPlatformChooser(null, null, thumbnailSourceTextBox);
-    if (paths) {
-        global.debugStatusTextBox[0].value = 'thumbnail file path =' + paths[0] + '\n';
-        thumbnailSourceTextBox.value = paths[0]; // just one for now, but eventually want ability to mass upload
-    }
-}
-
 uploadFileButton.addEventListener('click', () => {
     if (global.processedFileTextBox[0].value == '' || !global.processedFileTextBox[0].value) {
         alert('you havent selected a file'); return;
-    } 
+    }
     uploadVideoFile(processedFileTextBox[0].value.toString());
 })
 

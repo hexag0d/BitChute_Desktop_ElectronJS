@@ -1,93 +1,31 @@
-///*
-// * This file contains snips that might be useful for later applications
-// * It is typically just to store syntax 
-// * and to avoid having random hunks of unused code laying around the app.
-// * 
-// * Apparently devs don't like that ;} @hexagod
-// */
-
-////if (global.filepath && !file.canceled) {
-////    var formData = new FormData();
-////    formData.append('file', fs.createReadStream(global.filepath));
-////    axios.post('[Custom URL]', formData, {
-////        headers: {
-////            'Content-Type': 'multipart/form-data'
-////        }
-////    });
-////}
-///*
-// * File contains a standardized filechooser that differentiates between operating systems 
-// * 
-// * 
-// */
-//const file_chooser = {
-//    showXPlatformChooser,
-//}
-
-//module.exports = {
-//    file_chooser,
-//    showXPlatformChooser
-//}
-
-/*
- * I need to upgrade the framework to latest electron, chooser doesn't resolve to promise
- * */
 
 
-////types is either a single filetype or more likely an array of possible file types
-////sendTo is where you want the filepath sent to
-////@TODO localize strings, no time atm 
-//function showXPlatformChooser(types, label, sendTo) {
-//    if (!types) { types = '*.*' }
-//    if (!label) { label = 'use' }
-//    if (process.platform !== 'darwin') { // If the platform is 'win32' or 'Linux'
-//        dialog.showOpenDialog({  // Resolves to a Promise<Object> 
-//            title: global.localVidChooserLabel,
-//            defaultPath: path.join(__dirname, '../assets/'),
-//            buttonLabel: label,
-//            filters: [{ name: global.localFiles, extensions: [types] },],  // Restricting the user to only x Files. 
-//            properties: ['openFile']
-//        }).then(file => {
-//            console.log(file.canceled); // Stating whether dialog operation was cancelled or not. 
-//            if (!file.canceled) {
-//                if (!sendTo) { // no sendto set, return string immediately
-//                    console.log(file.filePaths[0].toString()); return file.filePaths[0].toString()
-//                }
-//                if (sendTo === 'event_keys.GET_VIDEO_INPUT_PATH') { //sendto input key for videos
-//                    console.log(file.filePaths[0].toString());
-//                    ipc.send(event_keys.GET_VIDEO_INPUT_PATH, paths[0]);
-//                    return;
-//                }
-//                sendTo.value = file.filePaths[0].toString();
-//                console.log(file.filePaths[0].toString());
-//            }
-//        }).catch(err => {
-//            console.log(err)
-//        });
+
+
+//ipc.on(event_keys.GET_VIDEO_INPUT_PATH, function (event, filePath) {
+//    console.log(filePath)
+//    try {
+//        const { ext, name, dir } = path.parse(filePath)
+//        var rndId = Math.floor((Math.random() * 10000000000) + 1);
+//        const proc = ffmpeg(filePath)
+//            .on('codecData', function (data) {
+//                console.log(data);
+//            })
+//            .on('end', function () {
+//                var newPath = `${dir}/${name}_${rndId}${ext}`;
+//            })
+//            .on('error', function (err) {
+//                console.log('an error happened: ' + err.message);
+//            })
+//            .on('progress', function ({ progress }) {
+//                console.log('progress percent: ' + progress);
+//            })
+//            .size('854x480')
+//            .audioBitrate('96k')
+//            .videoBitrate('213k')
+//            .save(`${dir}/${name}_${rndId}${ext}`)
+//    } catch (error) {
+
+//        alert(error);
 //    }
-//    else {
-//        // If the platform is 'darwin' (macOS) 
-//        dialog.showOpenDialog({
-//            title: global.localVidChooserLabel,
-//            defaultPath: path.join(__dirname, '../assets/'),
-//            buttonLabel: 'Upload',
-//            filters: [
-//                {
-//                    name: 'Text Files',
-//                    extensions: ['txt', 'docx']
-//                },],
-//            // Specifying the File Selector and Directory  
-//            // Selector Property In macOS 
-//            properties: ['openFile', 'openDirectory']
-//        }).then(file => {
-//            console.log(file.canceled);
-//            if (!file.canceled) {
-//                global.filepath = file.filePaths[0].toString();
-//                console.log(global.filepath);
-//            }
-//        }).catch(err => {
-//            console.log(err)
-//        });
-//    }
-//}
-
+//})

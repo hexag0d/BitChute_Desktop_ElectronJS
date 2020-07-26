@@ -11,14 +11,14 @@ const path = require('path')
 const url = require('url')
 const fs = require('fs')
 
-const ffmpeg = require('fluent-ffmpeg')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-ffmpeg.setFfmpegPath(ffmpegPath);
+//const ffmpeg = require('fluent-ffmpeg')
+//const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+//ffmpeg.setFfmpegPath(ffmpegPath);
 
 const { event_keys } = require('./constants')
 var { lng_support } = require('./languagesupport.js')
 
-let mainWindow
+mainWindow = undefined
 
 function createWindow() {
     lng_support.setLocalStrings(global.appLanguageSetting); // set the strings to their localized form @TODO not all strings set
@@ -27,6 +27,7 @@ function createWindow() {
           webPreferences: {
               //contextIsolation: true, ??? I don't have time to look into what this does @hexagod
               nodeIntegration: true,
+              //enableRemoteModule: true, ???  " "
             preload: './preload.js'
         }
     })
@@ -39,7 +40,6 @@ function createWindow() {
     }))
     mainWindow.autoHideMenuBar = true;
     mainWindow.webContents.openDevTools()  // @DEBUG
-    
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
@@ -70,39 +70,3 @@ app.on('activate', function () {
 })
 
 const ipc = require('electron').ipcMain
-
-// const path = require('path')
-
-ipc.on(event_keys.GET_VIDEO_INPUT_PATH, function (event, filePath) {
-    mainWindow.webContents.send('write-to-console', 'processing started..');
-     console.log(filePath)
-     try {
-         const { ext, name, dir } = path.parse(filePath)
-         var rndId = Math.floor((Math.random() * 10000000000) + 1);
-         const proc = ffmpeg(filePath)
-             .on('codecData', function(data) {
-                 console.log(data);
-                 //debugStatusTextBox.
-             })
-             .on('end', function() {
-                 console.log('file has been converted succesfully');
-                 var newPath = `${dir}/${name}_${rndId}${ext}`;
-                 mainWindow.webContents.send('write-to-console', 'processing finished @ : ' + newPath);
-                 mainWindow.webContents.send('forward-file', newPath);
-             })
-             .on('error', function(err) {
-                 console.log('an error happened: ' + err.message);
-                 mainWindow.webContents.send('write-to-console', 'error @ : ' + err.message);
-             })
-             .on('progress', function({ percent }) {
-                 console.log('progress percent: ' + percent);
-             })
-             .size('854x480') 
-             .audioBitrate('96k')
-             .videoBitrate('213k')
-             .save(`${dir}/${name}_${rndId}${ext}`)
-     } catch (error) {
-         mainWindow.webContents.send('write-to-console', error.message);
-         alert(error);
-     }
- })
