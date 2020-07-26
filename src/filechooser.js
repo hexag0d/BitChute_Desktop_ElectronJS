@@ -1,11 +1,11 @@
 //types is either a single filetype or more likely an array of possible file types
+//@TODO localize strings, no time atm 
 showXPlatformChooser = function (types, label) {
     if (!types) { types = '*.*' }
-    if (!label) { label = 'open' } 
+    if (!label) { label = 'use' } 
     if (process.platform !== 'darwin') { // If the platform is 'win32' or 'Linux'
-        // Resolves to a Promise<Object> 
-        dialog.showOpenDialog({
-            title: 'Select the File to be uploaded',
+        dialog.showOpenDialog({  // Resolves to a Promise<Object> 
+            title: global.localVidChooserLabel,
             defaultPath: path.join(__dirname, '../assets/'),
             buttonLabel: label,
             // Restricting the user to only Text Files. 
