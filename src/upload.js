@@ -9,34 +9,38 @@ const ipc = require('electron').ipcRenderer
 const dialog = electron.remote.dialog;
 
 //ui
-var chooseFileButton = document.getElementById('ChooseFile');
-var chooseThumbnailButton = document.getElementById('ChooseImageButton');
-var uploadFileButton = document.getElementById('UploadButton');
-var uploadThumbnailButton = document.getElementById('')
+chooseVideoFileButton = document.getElementById('ChooseVideoFile');
+chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
+uploadFileButton = document.getElementById('UploadVideoButton');
+uploadThumbnailButton = document.getElementById('');
 
-var diagnosticTextBox = document.getElementById('HttpsDiagnosticTextBox');
-var endpointTextBox = document.getElementById('EndpointUrlTextBox');
-var thumbnailSourceTextBox = document.getElementById('ThumbnailSourceText');
+diagnosticTextBox = document.getElementById('HttpsDiagnosticTextBox');
+endpointTextBox = document.getElementById('EndpointUrlTextBox');
+thumbnailSourceTextBox = document.getElementById('ThumbnailSourceText');
 
-global.filepath = undefined; // not used ATM, was in the snippet ... interesting how JS uses so many globes, none of the kool kids use globes in c# ;]
+processedFileTextBox = document.getElementById('ProcessedFileLink');
 
-chooseFileButton.addEventListener('click', () => {
-    dialog.showOpenDialog({ properties: ['openFile'] }, function (paths) {
-        console.log(paths)
-        global.debugStatusTextBox[0].value = 'video file path =' + paths[0] + '\n';
-        ipc.send(event_keys.GET_INPUT_PATH, paths[0]);
-    })
+$(document).ready(() => {
+    chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
+    chooseThumbnailButton.addEventListener('click', chooseThumbnailOnClick());
+})
+//event_keys.GET_VIDEO_INPUT_PATH
+chooseVideoFileButton.addEventListener('click', () => {
+    file_chooser.showXPlatformChooser(null, null, 'inputPath');
 })
 
 chooseThumbnailButton.addEventListener('click', () => {
-    dialog.showOpenDialog({filters: [{ name: 'Image Files', extensions: ['avi', 'mp4', '*.*'] },
-        ], properties: ['openFile']
-    }, function (paths) {
-        console.log(paths)
+        file_chooser.showXPlatformChooser(null, null, thumbnailSourceTextBox);
+        thumbnailSourceTextBox.value = paths[0]; // just one for now, but eventually want ability to mass upload
+})
+
+function chooseThumbnailOnClick() {
+    var paths = file_chooser.showXPlatformChooser(null, null, thumbnailSourceTextBox);
+    if (paths) {
         global.debugStatusTextBox[0].value = 'thumbnail file path =' + paths[0] + '\n';
         thumbnailSourceTextBox.value = paths[0]; // just one for now, but eventually want ability to mass upload
-    })
-})
+    }
+}
 
 uploadFileButton.addEventListener('click', () => {
     if (global.processedFileTextBox[0].value == '' || !global.processedFileTextBox[0].value) {

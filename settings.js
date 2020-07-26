@@ -23,6 +23,6 @@ supportedVideoTypes = 'avi', 'mov', 'mp4'; //there are probably more, but just f
 
 //begin app settings -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-appLanguageSetting = 'eng';
+appLanguageSetting = 'eng'; //english is my major so...
 
 //end app only settings -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

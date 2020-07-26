@@ -1,12 +1,10 @@
 /*
  * This file contains methods related to general app events
- * also contains mainWindow methods
+ * also contains mainWindow methods @hexagod
  */
 
 const electron = require('electron')
-// Module to control application life.
 const app = electron.app
-// Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
@@ -18,27 +16,30 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const { event_keys } = require('./constants')
+var { lng_support } = require('./languagesupport.js')
 
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow() {
-    global.setLocalStrings(appLanguageSetting); // set the strings to their localized form @TODO not all strings set
-  // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 800, height: 600 })
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-  // Open the DevTools.
-    //mainWindow.webContents.openDevTools()  // @DEBUG
+    lng_support.setLocalStrings(global.appLanguageSetting); // set the strings to their localized form @TODO not all strings set
+    mainWindow = new BrowserWindow({
+        width: 1280, height: 768,
+          webPreferences: {
+              //contextIsolation: true, ??? I don't have time to look into what this does @hexagod
+              nodeIntegration: true,
+            preload: './preload.js'
+        }
+    })
+    window = mainWindow;
+    window.$ = window.jQuery = require('jquery');
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    }))
+    mainWindow.autoHideMenuBar = true;
+    mainWindow.webContents.openDevTools()  // @DEBUG
     
-  // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
@@ -68,19 +69,11 @@ app.on('activate', function () {
   }
 })
 
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-
 const ipc = require('electron').ipcMain
 
 // const path = require('path')
 
-//debugStatusTextBox = document.getElementById('DebugStatusTextBox');
-
-
-ipc.on(event_keys.GET_INPUT_PATH, function (event, filePath) {
+ipc.on(event_keys.GET_VIDEO_INPUT_PATH, function (event, filePath) {
     mainWindow.webContents.send('write-to-console', 'processing started..');
      console.log(filePath)
      try {

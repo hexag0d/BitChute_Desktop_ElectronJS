@@ -6,24 +6,36 @@
  * functionality of the app but I'll be slowly moving them into this file @hexagod
  */
 
-setLocalStrings = function (lang) {
+const lng_support = {
+    setLocalStrings,
+}
+
+module.exports = {
+    lng_support,
+    setLocalStrings,
+}
+
+function setLocalStrings(lang) {
     switch (lang) {
         case 'eng': setLocalStringsToEng();
     }
 }
 
+//global localized strings to be set on app load
 localChoose = '';
 localUpload = '';
 localVidChooserLabel = '';
 localNoFileSelected = '';
-
+localFiles = '';
 
 //begin English =-=-
 setLocalStringsToEng = function () {
-    localChoose = '';
-    localUpload = '';
+    localChoose = 'Choose a Filec';
+    localUpload = 'Upload';
     localVidChooserLabel = 'Select the File to be uploaded';
-    localNoFileSelected = '';
+    localNoFileSelected = 'No file selected.. choose one first';
+    localFiles = 'Files';
 }
 
-//end English
+//end English =-=-
+

@@ -1,5 +1,3 @@
-$(document).ready(() => {
-    debugStatusTextBox = $('#DebugStatusTextBox');
-    processedFileTextBox = $('#ProcessedFileLink');
-    //uploadFileButton = $('#UploadButton');
-});
+window.$ = window.jQuery = require('jquery');
+
+debugStatusTextBox = document.getElementById('DebugStatusTextBox');

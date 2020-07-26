@@ -10,13 +10,20 @@ h1 {
 }
 
 input {
-    width: 175px;
+    color: white;
+    background:black;
+    font-size:14px;
+}
+
+button {
+    color:white;
+    background:black;
 }
 
 textarea {
     color: white;
-    background:black;
-    width: 545px;
+    background: black;
+    font-size: 14px;
 }
 
 .float-container {
