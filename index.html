@@ -13,19 +13,13 @@
   </head>
   <body>
 <div class="float-container">
-
   <div class="MainColumnLeft">
     <div class="VideoOptionDiv"></div>
           <h1>
         <img alt="" src="rsrc\signage\logo_bronze.png" />.ElectronJS a.001 </h1>
-      
-    <!--<input type="file" accept="video/mp4" />-->
-
     <div id="async-msg">Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
       <button id="ChooseFile">video to encode</button>
-
-    <!-- All of the Node.js APIs are available in this renderer process. -->
       <input type="text" id="FileToEncode"/>
       <p>
           <textarea id="DebugStatusTextBox" name="text" rows="12" cols="50"></textarea>
@@ -34,7 +28,7 @@
       <div style="height: 309px; width: 568px; margin-left: 0px; margin-bottom: 0px;border: solid grey">
           Debugging tools (advanced users only):<br />
           Auth Token:&nbsp;&nbsp;
-          <input id="AuthTokenTextBox" type="password"/>&nbsp; &lt;&lt; be careful where you POST<br />
+          <input id="AuthTokenTextBox" type="password"/>&nbsp; &lt;&lt; be careful where you POST!<br />
           Endpoint POST url:
           <input id="EndpointUrlTextBox" type="text" value="https://bitchute.com/myupload/"/> &lt;&lt;<br />
           Manual Cookie:
@@ -46,6 +40,7 @@
 
       </div>
     <script>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
       // You can also require other files to run in this process
       require('./renderer.js')
     </script>
@@ -56,7 +51,6 @@
   <div class="MainColumnRight">
     <div class="MetaOptionDiv">
         <div style="height:100%">
-
             <br />
             <br />
             <br />
@@ -69,10 +63,18 @@
             <img alt="" src="rsrc/examples/CURE2.png" style="width:100%;object-fit:contain" /><br />
             </div>
             <br />
-            <input id="ChooseImageButton" type="button" value="choose a thumbnail" /><input id="ThumbnailSourceText" type="text" /></div>
+            <input id="ChooseImageButton" type="button" value="choose a thumbnail" /><input id="ThumbnailSourceText" type="text" /><input id="UploadThumbnailButton" type="button" value="Upload" /></div>
      </div>
   </div>
-  
+        <p>
+          This app is designed to lighten the load on bitchute.com remote server processing.  By @hexagod, Ray Vahey, Rich Jones & template @likethemammal 
+      </p>
+      <div style="position:relative;align-items:flex-end;">
+          using Node.js <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.
+              
+      </div>
 </div>
   </body>
 </html>

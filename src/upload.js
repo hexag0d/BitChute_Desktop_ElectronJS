@@ -10,25 +10,43 @@ const dialog = electron.remote.dialog;
 
 //ui
 var chooseFileButton = document.getElementById('ChooseFile');
+var chooseThumbnailButton = document.getElementById('ChooseImageButton');
 var uploadFileButton = document.getElementById('UploadButton');
+var uploadThumbnailButton = document.getElementById('')
+
 var diagnosticTextBox = document.getElementById('HttpsDiagnosticTextBox');
 var endpointTextBox = document.getElementById('EndpointUrlTextBox');
+var thumbnailSourceTextBox = document.getElementById('ThumbnailSourceText');
 
 global.filepath = undefined; // not used ATM, was in the snippet ... interesting how JS uses so many globes, none of the kool kids use globes in c# ;]
-
 
 chooseFileButton.addEventListener('click', () => {
     dialog.showOpenDialog({ properties: ['openFile'] }, function (paths) {
         console.log(paths)
-        global.debugStatusTextBox[0].value = 'file path ' + paths[0] + '\n';
+        global.debugStatusTextBox[0].value = 'video file path =' + paths[0] + '\n';
         ipc.send(event_keys.GET_INPUT_PATH, paths[0]);
+    })
+})
+
+chooseThumbnailButton.addEventListener('click', () => {
+    dialog.showOpenDialog({filters: [{ name: 'Image Files', extensions: ['avi', 'mp4', '*.*'] },
+        ], properties: ['openFile']
+    }, function (paths) {
+        console.log(paths)
+        global.debugStatusTextBox[0].value = 'thumbnail file path =' + paths[0] + '\n';
+        thumbnailSourceTextBox.value = paths[0]; // just one for now, but eventually want ability to mass upload
     })
 })
 
 uploadFileButton.addEventListener('click', () => {
     if (global.processedFileTextBox[0].value == '' || !global.processedFileTextBox[0].value) {
-        alert('you havent select a file'); return;
-    } //Diag stuff
+        alert('you havent selected a file'); return;
+    } 
+    uploadVideoFile(processedFileTextBox[0].value.toString());
+})
+
+function uploadVideoFile(source) {
+     //Diag stuff
     var tempAuthToken = getAxiosHeaders().Authorization.toString(); // this is a token so I don't think we should leave it laying around
     var maskedAuth = tempAuthToken.slice(0, 10); //take the token and keep only the bearer + ~3 chars, which isn't enough to steal the token, but likely enough to see what you're getting
     maskedAuth = (maskedAuth + 'xxxxxxxxxxxxxxxxxx') // build the masked string for diag
@@ -40,7 +58,7 @@ uploadFileButton.addEventListener('click', () => {
     var pvp = processedFileTextBox[0].value.toString();
     var sendTo = endpointTextBox.value.toString();
     postVideoData(pvp, getAxiosHeaders(), sendTo);
-})
+}
 
 function getAxiosHeaders() {
     var authTokenTextBox = document.getElementById('AuthTokenTextBox');
@@ -48,8 +66,8 @@ function getAxiosHeaders() {
     var axiosHeader = {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${toke}`
-            //"Access-Control-Allow-Origin": "*",
-        //'User-Agent': 'Console app' ?
+        //"Access-Control-Allow-Origin": "*",
+        //'User-Agent': 'Console app' ? //saving these here in case we need them, not enough to justify moving into unused snips @hexagod
     }
     toke = undefined;
     authTokenTextBox = undefined;
@@ -69,69 +87,4 @@ async function postVideoData(localDataPath, headers, url) {
 }
 
 function writeToDiagnosticText(text) { diagnosticTextBox.value += (text + '\n') }
-
-//if (global.filepath && !file.canceled) {
-//    var formData = new FormData();
-//    formData.append('file', fs.createReadStream(global.filepath));
-//    axios.post('[Custom URL]', formData, {
-//        headers: {
-//            'Content-Type': 'multipart/form-data'
-//        }
-//    });
-//}
-//uploadFile.addEventListener('click', () => {
-//    // If the platform is 'win32' or 'Linux' 
-//    if (process.platform !== 'darwin') {
-//        // Resolves to a Promise<Object> 
-//        dialog.showOpenDialog({
-//            title: 'Select the File to be uploaded',
-//            defaultPath: path.join(__dirname, '../assets/'),
-//            buttonLabel: 'Upload',
-//            // Restricting the user to only Text Files. 
-//            filters: [
-//                {
-//                    name: 'Video Files',
-//                    extensions: ['avi', 'mp4', '*.*']
-//                },],
-//            // Specifying the File Selector Property 
-//            properties: ['openFile']
-//        }).then(file => {
-//            // Stating whether dialog operation was 
-//            // cancelled or not. 
-//            console.log(file.canceled);
-//            if (!file.canceled) {
-//                // Updating the GLOBAL filepath variable  
-//                // to user-selected file. 
-//                global.filepath = file.filePaths[0].toString();
-//                console.log(global.filepath);
-//            }
-//        }).catch(err => {
-//            console.log(err)
-//        });
-//    }
-//    else {
-//        // If the platform is 'darwin' (macOS) 
-//        dialog.showOpenDialog({
-//            title: 'Select the File to be uploaded',
-//            defaultPath: path.join(__dirname, '../assets/'),
-//            buttonLabel: 'Upload',
-//            filters: [
-//                {
-//                    name: 'Text Files',
-//                    extensions: ['txt', 'docx']
-//                },],
-//            // Specifying the File Selector and Directory  
-//            // Selector Property In macOS 
-//            properties: ['openFile', 'openDirectory']
-//        }).then(file => {
-//            console.log(file.canceled);
-//            if (!file.canceled) {
-//                global.filepath = file.filePaths[0].toString();
-//                console.log(global.filepath);
-//            }
-//        }).catch(err => {
-//            console.log(err)
-//        });
-//    }
-//}); 
 
