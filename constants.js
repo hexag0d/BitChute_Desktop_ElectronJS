@@ -1,6 +1,7 @@
 
 const event_keys = {
-    GET_INPUT_PATH: 'GET_INPUT_PATH'
+    GET_VIDEO_INPUT_PATH: 'GET_VIDEO_INPUT_PATH' //video only
+    
 }
 
 
