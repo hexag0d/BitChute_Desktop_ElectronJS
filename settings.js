@@ -3,26 +3,33 @@
  * but may eventually prove useful @hexagod
  */
 
-//bitchute.com settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//bitchute.com settings
 
-// end bitchute settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// end bitchute settings
 
-//begin axios settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//begin axios settings
 
-//end axios settings-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//end axios settings
 
-//begin video settings -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//begin video settings 
 
-videoEncoderSettingResolution = '854x480';
+videoEncoderSettingResolution = '854x480'; 
 videoEncoderSettingAudioBitrate = '96k';
 videoEncoderSettingVideoBitrate = '213k';
 
 supportedVideoTypes = 'avi', 'mov', 'mp4'; //there are probably more, but just for now
 
-//end video settings  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//end video settings  
 
-//begin app settings -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//begin app settings 
 
-appLanguageSetting = 'eng'; //english is my major so...
+appLanguageSetting = 'eng'; 
 
-//end app only settings -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//end app only settings 
+
+
+//exports
+
+module.exports = {
+    appLanguageSetting
+}

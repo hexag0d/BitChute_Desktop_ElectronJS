@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
     <title>BitChute File Encoder</title>
     <link rel="stylesheet" href="css/global.css">
     <!--<style type="text/css">
@@ -11,23 +12,22 @@
     <div class="float-container">
         <div class="MainColumnLeft">
             <h1>
-                <img alt="" src="rsrc/signage/logo_bronze.png" style="object-fit:contain; width:90%"/>.ElectronJS a.001
+                <img alt="" src="rsrc/signage/logo_bronze.png" style="object-fit:contain; width:60%"/>.ElectronJS a.001
             </h1>
             <div id="async-msg">Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-            <button id="ChooseVideoFile">video to encode</button>
-            <input type="text" id="FileToEncode" />
+            <button id="ChooseVideoFile">video to encode</button><input type="text" id="VideoProcessorSourceTextBox" />&nbsp;&nbsp;&nbsp;<progress id="VideoProcessorProgressBar" value="0" max="100" style="width:35%;display:none;"></progress>
             <p>
                 <textarea id="DebugStatusTextBox" name="text" rows="12" style="width:90%;"></textarea>
             </p>
             <p>
-                <button id="UploadVideoButton" value="Upload">upload</button><input id="ProcessedFileLink" type="text" />
+                <button id="UploadVideoButton" value="Upload">upload</button><input id="ProcessedFileTextBox" type="text" />
             </p>
             <div style="height: 30%; width: 100%; margin-left: 0px; margin-bottom: 0px;border: solid grey">
                 Debugging tools (advanced users only):<br />
                 Auth Token:&nbsp;&nbsp;
-                <input id="AuthTokenTextBox" type="password" />&nbsp; &lt;&lt; be careful where you POST!<br />
+                <input id="AuthTokenTextBox" type="password" />&nbsp; &lt;&lt;<br />
                 Endpoint POST url:
-                <input id="EndpointUrlTextBox" type="text" value="https://bitchute.com/myupload/" /> &lt;&lt;<br />
+                <input id="EndpointUrlTextBox" type="text" value="https://httpbin.org/post" /> &lt;&lt;<br />
                 Manual Cookie:
                 <textarea id="CookieTextBox" style="width:80%" rows="2"></textarea><br />
                 Https Diag:<br />
@@ -45,12 +45,12 @@
             <br />
             <br />
             <br />
-            Title<br />
-            <input id="TitleText" type="text" style="width:100%" /><br />
+            <div class="local_title">Title</div> <!--I want to move the whole app over to databinding library but waiting on Ray/Rich to decide which one-->
+            <input id="TitleTextInput" type="text" style="width:100%" /><br />
             Description<br />
             <textarea id="DescriptionText" style="width:90%" name="S1" rows="6"></textarea><br />
-            <div style="max-width:100%;max-height:100%">
-                <img id="UploadThumbnailImage" alt="" src="rsrc/examples/CURE2.png" style="width:100%;object-fit:contain" /><br />
+            <div style="">
+                <img id="UploadThumbnailImage" alt="" src="rsrc/examples/CURE2.png" style="width:100%;object-fit:cover;" /><br />
             </div>
             <br />
             <button id="ChooseThumbnailButton">thumbnail</button>
@@ -58,8 +58,8 @@
             <button id="UploadThumbnailButton">upload</button>
         </div>
     </div>
-    <div>
-        <p>
+    <div class="PageFooter">
+        <p class="local_app_footer">
             This app is designed to lighten the load on bitchute.com remote server processing.  By @hexagod, Ray Vahey, Rich Jones & template @likethemammal
         </p>
         using Node.js
@@ -69,9 +69,12 @@
     and Electron
     <script>document.write(process.versions.electron)</script>.
     </div>
-    <script src="src/index.js"></script>
-    <script src="settings.js"></script>
-    <script src="src/filechooser.js"></script>
-    <script src="src/upload.js"></script>
+    <script>
+        require('./index.js')
+        require('./ui/processor.js')
+        require('./src/filechooser.js') 
+        require('./src/video_encoding.js')
+        require('./src/upload.js')
+    </script>
 </body>
 </html>

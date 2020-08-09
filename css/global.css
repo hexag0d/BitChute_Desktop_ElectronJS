@@ -26,6 +26,11 @@ textarea {
     font-size: 14px;
 }
 
+progress {
+    background-color:black;
+    color: chartreuse;
+}
+
 .float-container {
     padding: 5px;
 }
@@ -41,3 +46,7 @@ textarea {
     float: left;
     padding: 20px;
 }  
+
+.PageFooter {
+    display: inline-block;
+}

@@ -1,59 +1,35 @@
 /*
  * A standardized filechooser that differentiates between operating systems 
  * @hexagod
- * 
  */
 const electron = require('electron')
 const ipc = require('electron').ipcRenderer
-const dialog = electron.remote.dialog;
+const dialog = electron.remote.dialog
 const path = require('path')
+const video_encoder = require('./video_encoding.js')
 
-const file_chooser = {
-    showXPlatformChooser,
-}
+var diag = require('./diagnostic.js')
 
 module.exports = {
-    showXPlatformChooser,
-    encodeFile
+    showXPlatformChooser
 }
-
-
-chooseVideoFileButton = document.getElementById('ChooseVideoFile');
-chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
-thumbnailImage = document.getElementById('UploadThumbnailImage');
-thumbnailSourceTextBox = document.getElementById('ProcessedFileLink')
-
-chooseThumbnailOnClick = function () {
-    var paths = file_chooser.showXPlatformChooser(null, null, global.thumbnailSourceTextBox);
-    if (paths) {
-
-        global.debugStatusTextBox.value = 'thumbnail file path =' + paths[0] + '\n';
-        thumbnailSourceTextBox.value = paths[0]; // just one for now, but eventually want ability to mass upload
-    }
-}
-
-chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
-chooseThumbnailButton.addEventListener('click', chooseThumbnailOnClick());
 
 chooseVideoFileButton.addEventListener('click', () => {
-    file_chooser.showXPlatformChooser(null, null, 'inputPath');
+    showXPlatformChooser(null, null, 'videoUploadSource');
 })
 
 chooseThumbnailButton.addEventListener('click', () => {
-    var th_path = file_chooser.showXPlatformChooser(null, null, 'none');
-    writeToDebug(th_path)
-    thumbnailSourceTextBox.value = th_path;
-
-    thumbnailImage.src = th_path;
+    showXPlatformChooser(null, null, 'thumbnailUploadSource');
 })
 
-var
+generalStaticFilePath = '';
+temFile = undefined;
 
 function showXPlatformChooser(types, label, sendTo) {
     if (!types) { types = '*.*' }
     if (!label) { label = 'use' }
     if (process.platform !== 'darwin') { // If the platform is 'win32' or 'Linux'
-        dialog.showOpenDialog({  // Resolves to a Promise<Object> 
+        dialog.showOpenDialog({  
             title: global.localVidChooserLabel,
             defaultPath: path.join(__dirname, '../assets/'),
             buttonLabel: label,
@@ -61,98 +37,72 @@ function showXPlatformChooser(types, label, sendTo) {
             properties: ['openFile']
         }).then(file => {
             if (!file.canceled) {
-                if (sendTo == 'none') { // no sendto set, return string immediately
-                    console.log(file.filePaths[0].toString()); return file.filePaths[0].toString()
+                console.log(file.filePaths[0]);
+                if (sendTo == 'thumbnailUploadSource') { // no sendto set, return string immediately
+                    onThumbnailChosen(file.filePaths[0]);
+                    return;
                 }
-                if (sendTo == 'inputPath') { //sendto input key for videos
-                    console.log(file.filePaths[0].toString());
-                    //ipc.send(event_keys.GET_VIDEO_INPUT_PATH, file.filePaths[0].toString()); return;
-                    encodeFile(file.filePaths[0].toString());
+                else if (sendTo == 'videoUploadSource') { //sendto video upload source
+                    onVideoSourceChosen(file.filePaths[0]);
+                    return;
                 }
-                else {
-                    //ipc.send(event_keys.GET_VIDEO_INPUT_PATH, file.filePaths[0].toString()); this doesn't work.  The  event_keys.GET_VIDEO_INPUT_PATH events stopped functioning after I updated electron
-                    console.log(file.filePaths[0].toString());
-                    
-                    encodeFile(file.filePaths[0]);
+                else if (sendTo) { // send to any place
+                    try { sendTo = file.filePaths[0]; }
+                    catch (err) { diag.writeToDebug(err.message) }
+                    return;
+                }
+                else if (!sendTo) { // return to to generic 
+                    return file.filePaths[0];
                 }
             }
         }).catch(err => {
-            console.log(err)
+               diag.writeToDebug(err.message); console.log(err)
         });
-    }
-    else {
-        // If the platform is 'darwin' (macOS) 
-        dialog.showOpenDialog({
+    } else {
+        dialog.showOpenDialog({ // the platform is 'darwin' (macOS) 
             title: global.localVidChooserLabel,
             defaultPath: path.join(__dirname, '../assets/'),
-            buttonLabel: 'Upload',
-            filters: [
-                {
-                    name: 'Text Files',
+            buttonLabel: localUpload,
+            filters: [{
+                name: global.localFiles,
                     extensions: ['txt', 'docx']
                 },],
-            // Specifying the File Selector and Directory  
-            // Selector Property In macOS 
-            properties: ['openFile', 'openDirectory']
-        }).then(file => {
+            properties: ['openFile', 'openDirectory'] 
+        }).then(file => { // @TODO someone with a mac needs to test this @hexagod
             console.log(file.canceled);
             if (!file.canceled) {
-                global.filepath = file.filePaths[0].toString();
-                console.log(global.filepath);
+                console.log(file.filePaths[0]);
+                if (sendTo == 'thumbnailUploadSource') { 
+                    onThumbnailChosen(file.filePaths[0]);
+                    return;
+                }
+                else if (sendTo == 'videoUploadSource') { 
+                    onVideoSourceChosen(file.filePaths[0]);
+                    return;
+                }
+                else if (sendTo) { 
+                    sendTo = file.filePaths[0];
+                    return;
+                }
+                else if (!sendTo) { 
+                    return file.filePaths[0]; 
+                }
             }
         }).catch(err => {
-            console.log(err)
+            diag.writeToDiagnosticText(err.message); console.log(err)
         });
     }
 }
 
-const ffmpeg = require('fluent-ffmpeg')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-ffmpeg.setFfmpegPath(ffmpegPath);
-
-const { event_keys } = require('./constants')
-
-const url = require('url')
-const fs = require('fs')
-
-function encodeFile(file_path) {
-    writeToDebug(file_path)
-    try {
-        //C:\Users\hegsagawd\desktop1\vid\5678.mp4
-
-        const { ext, name, dir } = path.parse(file_path)
-        var rndId = Math.floor((Math.random() * 10000000000) + 1);
-        const proc = ffmpeg(file_path)
-            .on('codecData', function (data) {
-                writeToDebug(data);
-                writeToDebug('processing video... ');
-            })
-            .on('end', function () {
-                var _new_path = `${dir}/${name}_${rndId}${ext}`;
-                onVideoFinishedProcessing(_new_path);
-            })
-            .on('error', function (err) {
-                writeToDebug('an error happened: ' + err.message);
-            })
-            .on('progress', function ({ percentage }) {
-            })
-            .size('854x480')
-            .audioBitrate('96k')
-            .videoBitrate('213k')
-            .save(`${dir}/${name}_${rndId}${ext}`)
-
-    } catch (error) {
-        alert(error);
-    }
+function onVideoSourceChosen(vid_path) {
+    diag.writeToDebug(global.localVideoSourceSelected + '\n' + vid_path);
+    videoProcessorSourceTextBox.value = vid_path;
+    video_encoder.encodeFile(vid_path);
 }
 
-var processedFileTextBox = document.getElementById('')
-
-function writeToDebug(text) { global.debugStatusTextBox.value += (text + '\n') }
-var processedVidPathText = document.getElementById('ProcessedFileLink')
-
-function onVideoFinishedProcessing(vidPath) {
-    writeToDebug('video finished processing @' + vidPath);
-    processedVidPathText.value = vidPath;
+function onThumbnailChosen(file_path) {
+    thumbnailSourceTextBox.value = file_path;
+    thumbnailImage.src = file_path;
+    thumbnailImage.height = (thumbnailImage.width * 0.5625); // there might be a better way to do this with css
+    diag.writeToDebug(global.localThumbnailSelectedAt + ' @ ' + file_path);
 }
-

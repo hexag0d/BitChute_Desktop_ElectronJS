@@ -11,34 +11,34 @@ const path = require('path')
 const url = require('url')
 const fs = require('fs')
 
-//const ffmpeg = require('fluent-ffmpeg')
-//const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-//ffmpeg.setFfmpegPath(ffmpegPath);
-
 const { event_keys } = require('./constants')
-var { lng_support } = require('./languagesupport.js')
+const app_setting = require('./settings')
+
 
 mainWindow = undefined
 
 function createWindow() {
-    lng_support.setLocalStrings(global.appLanguageSetting); // set the strings to their localized form @TODO not all strings set
+
     mainWindow = new BrowserWindow({
         width: 1280, height: 768,
           webPreferences: {
               //contextIsolation: true, ??? I don't have time to look into what this does @hexagod
               nodeIntegration: true,
-              //enableRemoteModule: true, ???  " "
+              enableRemoteModule: true,
             preload: './preload.js'
         }
     })
     window = mainWindow;
     window.$ = window.jQuery = require('jquery');
+    mainWindow.autoHideMenuBar = true;
+    //mainWindow.setMenu(null) // @RELEASE
+    
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }))
-    mainWindow.autoHideMenuBar = true;
+    
     mainWindow.webContents.openDevTools()  // @DEBUG
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
@@ -68,5 +68,3 @@ app.on('activate', function () {
     createWindow()
   }
 })
-
-const ipc = require('electron').ipcMain
