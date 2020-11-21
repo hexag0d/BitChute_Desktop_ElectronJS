@@ -12,6 +12,7 @@
  */
 
 //global localized strings to be set on app load
+
 localChoose = '';
 localUpload = '';
 localVidChooserLabel = '';

@@ -14,12 +14,15 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^9.1.1"
+    "electron": "^9.1.1",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "axios": "^0.19.2",
     "fluent-ffmpeg": "^2.1.2",
-    "jquery": "^3.5.1"
+    "form-data": "^3.0.0",
+    "jquery": "^3.5.1",
+    "superagent": "^6.1.0"
   }
 }

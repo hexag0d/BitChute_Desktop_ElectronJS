@@ -25,13 +25,14 @@ function createWindow() {
               //contextIsolation: true, ??? I don't have time to look into what this does @hexagod
               nodeIntegration: true,
               enableRemoteModule: true,
+              
             preload: './preload.js'
         }
     })
     window = mainWindow;
     window.$ = window.jQuery = require('jquery');
     mainWindow.autoHideMenuBar = true;
-    //mainWindow.setMenu(null) // @RELEASE
+    mainWindow.setMenu(null) // @RELEASE
     
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),

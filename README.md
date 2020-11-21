@@ -2,22 +2,17 @@ Implementation: for BitChute.com video pre-processing and possibly more
 
 app.by( @bitchute = { Ray Vahey, Rich Jones }
 @hexagod {
-channel = bitchute.com/channel/hexagod 
-twitter = @vybeypantelonez
-minds = @hexagod
-gab.ai = @hexagod
-}); // + see below
+channel = bitchute.com/channel/hexagod, 
+twitter = @vybeypantelonez,
+minds = @hexagod,
+gab.ai = @hexagod,
+}) // + see below
 
 To get started:
 1.) clone the repo
 2.) open command prompt and cd to your repo root then run the following commands:
-3.) npm install --save-dev electron
-4.) npm install fluent-ffmpeg@2.1.2
-5.) npm install axios --save
-6.) npm install jquery --save
-7.) npm i custom-electron-titlebar (optional)
-
-Finally, run: npm start 
+3.) npm install 
+4.) npm start
 
 Repo locations: 
 https://gitlab.com/BitChute/bitchuteuploader (Ray Official)

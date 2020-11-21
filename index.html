@@ -12,24 +12,22 @@
     <div class="float-container">
         <div class="MainColumnLeft">
             <h1>
-                <img alt="" src="rsrc/signage/logo_bronze.png" style="object-fit:contain; width:60%"/>.ElectronJS a.001
+                <img alt="" src="rsrc/signage/logo_bronze.png" style="object-fit:contain; width:46%; "/><a id="ElectronAppLabel">.ElectronJS a.</a>1
             </h1>
             <div id="async-msg">Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-            <button id="ChooseVideoFile">video to encode</button><input type="text" id="VideoProcessorSourceTextBox" />&nbsp;&nbsp;&nbsp;<progress id="VideoProcessorProgressBar" value="0" max="100" style="width:35%;display:none;"></progress>
+            <button id="ChooseVideoFile">video to encode</button><input type="text" id="VideoProcessorSourceTextBox" style="width: 50%" />&nbsp;&nbsp;&nbsp;<progress id="VideoProcessorProgressBar" value="0" max="100" style="width:35%;display:none;"></progress>
             <p>
                 <textarea id="DebugStatusTextBox" name="text" rows="12" style="width:90%;"></textarea>
             </p>
             <p>
-                <button id="UploadVideoButton" value="Upload">upload</button><input id="ProcessedFileTextBox" type="text" />
+                <button id="UploadVideoButton" value="Upload">upload</button><input id="ProcessedFileTextBox" type="text" style="width: 55%" />
             </p>
-            <div style="height: 30%; width: 100%; margin-left: 0px; margin-bottom: 0px;border: solid grey">
+            <p>
+                <input id="PostVideoFinalButton" type="button" value="Post Video" /></p>
+            <div style="width: 222px">
+                <input id="PublishNowCheckBox" type="checkbox" style="width: 10%" />Publish Now?</div>
+            <div style="height: 30%; width: 100%; margin-left: 0px; margin-bottom: 0px;border: solid grey; display: none;">
                 Debugging tools (advanced users only):<br />
-                Auth Token:&nbsp;&nbsp;
-                <input id="AuthTokenTextBox" type="password" />&nbsp; &lt;&lt;<br />
-                Endpoint POST url:
-                <input id="EndpointUrlTextBox" type="text" value="https://httpbin.org/post" /> &lt;&lt;<br />
-                Manual Cookie:
-                <textarea id="CookieTextBox" style="width:80%" rows="2"></textarea><br />
                 Https Diag:<br />
                 <textarea id="HttpsDiagnosticTextBox" name="text" style="height: 30%; width:80%"></textarea>
             </div>
@@ -37,20 +35,40 @@
     </div>
     <div class="MainColumnRight">
         <div class="MetaOptionDiv">
-            <div></div>
+            <div>
+                &nbsp;
+                <div style="float: left; width: 50%; height: 126px;">
+                    Username: 
+                <input id="UserNameTextBox" type="text"/>
+                    <br />
+                    Password:&nbsp;<input id="PasswordTextBox" type="password"/>&nbsp;<br />
+&nbsp;<input id="LoginButton" type="button" value="Login" /><input id="GetUploadTokenButton" type="button" value="Get Upload Token" /><input id="GetInitialResponseButton" type="button" value="Get Initial Response" /><br />
+                </div>
+                &nbsp;<div id="token-container" style="width: 45%; float: right; height: 112px;">
+                    CSRFmwToken: <input id="CsrfMiddleWareTokenTextBox" type="text" />
+                    <br />
+                    Upload Token:<input id="UploadTokenTextBox" type="text" /><br />
+                    Posting Url:<input id="PostingLocationTextBox" class="large-input" style="width: 50%; margin-bottom: 1px;" type="text" /><input id="LoginDiagnosticTextBox" style="width: 100%; height: 21px" type="text" />
+
+                      </div>
+                <br />
+                <br />
+                
+            </div>
             <br />
             <br />
             <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <div class="local_title">Title</div> <!--I want to move the whole app over to databinding library but waiting on Ray/Rich to decide which one-->
-            <input id="TitleTextInput" type="text" style="width:100%" /><br />
+            <div style="height: 182px">
+                <br />
+                <br />
+            Title<br />
+            <input id="TitleTextInput" type="text" value="" style="width:98%" /><br />
             Description<br />
-            <textarea id="DescriptionText" style="width:90%" name="S1" rows="6"></textarea><br />
+            <textarea id="DescriptionText" style="width:90%" name="S1" rows="6" cols="20"></textarea></div>
+            <br />
+            <br />
             <div style="">
-                <img id="UploadThumbnailImage" alt="" src="rsrc/examples/CURE2.png" style="width:100%;object-fit:cover;" /><br />
+                <img id="UploadThumbnailImage" alt="" src="rsrc/signage/video_thumbnail_placeholder.jpg" style="width:100%;object-fit:cover;" /><br />
             </div>
             <br />
             <button id="ChooseThumbnailButton">thumbnail</button>
@@ -59,15 +77,6 @@
         </div>
     </div>
     <div class="PageFooter">
-        <p class="local_app_footer">
-            This app is designed to lighten the load on bitchute.com remote server processing.  By @hexagod, Ray Vahey, Rich Jones & template @likethemammal
-        </p>
-        using Node.js
-    <script>document.write(process.versions.node)</script>,
-    Chromium
-    <script>document.write(process.versions.chrome)</script>,
-    and Electron
-    <script>document.write(process.versions.electron)</script>.
     </div>
     <script>
         require('./index.js')

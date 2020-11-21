@@ -2,17 +2,23 @@ body {
     background: black;
     font: 18px Arial, sans-serif;
     color: white;
-    height: 706px;
+    height: 100%;
 }
 
 h1 {
     color: white;
 }
 
+large-input {
+    width: 100%;
+}
+
 input {
     color: white;
     background:black;
     font-size:14px;
+    width: 145px;
+    margin-right: 0px;
 }
 
 button {
@@ -36,14 +42,14 @@ progress {
 }
 
 .MainColumnLeft {
-    width: 45%;
+    width: 42%;
     float: left;
     padding: 20px;
 }
 
 .MainColumnRight {
-    width: 45%;
-    float: left;
+    width: 50%;
+    float: right;
     padding: 20px;
 }  
 
