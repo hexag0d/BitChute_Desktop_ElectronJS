@@ -22,6 +22,11 @@ localVideoFinishedProcessing = '';
 localProcessingVideo = '';
 localGeneralError = '';
 localVideoSourceSelected = '';
+localThumbnailSelectedAt = '';
+localVideoFramesProcessed = '';
+localVideoPercentageComplete = '';
+localUnsafeRequestDetected = '';
+local_login_success = '';
 
 //begin English =-=-
 
@@ -39,6 +44,7 @@ function setLocalStringsToEng() {
     localVideoFramesProcessed = 'frames processed';
     localVideoPercentageComplete = ' percent completed';
     localUnsafeRequestDetected = 'unsafe POST path detected, you are posting your auth token to a non-bitchute endpoint.';
+    local_login_success = 'successfully logged in as user '
 }
 
 //end English =-=-

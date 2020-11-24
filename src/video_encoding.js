@@ -20,7 +20,7 @@ function encodeFile(file_path) {
                 diag.writeToDebug(vl);
                 diag.writeToDebug(data);
                 diag.writeToDebug(global.localProcessingVideo + '... ');
-                videoProcessorProgressBar.style.display = 'inline';
+                videoProcessorProgressBar.style.display = 'inline'; // @TODO move into view models
             })
             .on('end', function () {
                 var _new_path = `${dir}/${name}_${rndId}${ext}`;
@@ -31,7 +31,9 @@ function encodeFile(file_path) {
                 diag.writeToDebug(global.localGeneralError + err.message);
             })
             .on('progress', function ({ timemark }) {
-                videoProcessorProgressBar.value = parseFloat(((convertTimeStampToSeconds(timemark) / vl) * 100).toString().substring(0, 4));
+                videoProcessorProgressBar.value = // @TODO move into view models
+                    parseFloat(((convertTimeStampToSeconds(timemark) / vl)
+                        * 100).toString().substring(0, 4));
             })
             .size(videoEncoderSettingResolution) 
             .audioBitrate(videoEncoderSettingAudioBitrate)

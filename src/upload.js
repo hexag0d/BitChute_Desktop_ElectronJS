@@ -14,22 +14,23 @@
  * 
  * Add batch uploading for bitchute.com donors
  * 
- * It needs to get split up between login and upload
+ * This file needs to get split up between login and upload
  * methods since they really shouldn't share a code file
  * 
  * The UI needs to get separated from the business logic
  * 
- * There's a bunch of static vars that need to get turned
- * into a class but we're not in C# anymore so I'll have to
- * lookup how to do that
- * 
- * part of the reason I'm using them atm is to inspect 
+ * There's also a bunch of static vars that need to get turned
+ * into a class OR preferably removed 
+ * part of the reason I'm using the stat vars atm is to inspect 
  * the variables easily in console while I work this process
  * out
- * 
- * Right now I'm just trying to get this working and then
- * I'll start breaking this file up aswell as segregating the ui
- * 
+
+ this will already encode and post videos, but the process
+ needs streamlining and more n00b guards along the way
+ user can already process and upload videos to bitchute, but
+ gotta be the right order of button pushing and also none
+ of the server length restrictions IE for text length on the
+ title are checked before posting
  * */
 
 //framework
@@ -37,15 +38,24 @@
 
 const electron = require('electron');
 const net = electron.remote.net; 
+
+const session_state = require('./session_state.js');
+
 const FormData = require('form-data');
 const querystring = require('querystring');
 const https = require('https');
-const superagent = require('superagent')
+const superagent = require('superagent');
+const event_generation = require('../vm/event_generators.js');
+
 
 var diag = require('./diagnostic.js')
 var endpoints = require('./endpoints.js')
 const fs = require('fs')
 
+/*
+ @TODO These all need to get moved into the VM
+                vvvvvvvvvvvv
+ */           
 uploadVideoButton.addEventListener('click', () => {
     if (global.processedVideoTextBox.value == '' || !global.processedVideoTextBox.value) {
         alert(global.localNoFileSelected); return;
@@ -81,13 +91,12 @@ document.getElementById('PostVideoFinalButton').addEventListener('click', () => 
             latestVideoUploadCode,
             urlStringParts[urlStringParts.length - 2],
             urlStringParts[urlStringParts.length - 1],
-            10, //@TODO add sensitivity
+            10, //@TODO add sensitivity.. It's ALL safe for work now baby!
             document.getElementById('PublishNowCheckBox').checked,
             false
         ));
 
 })
-
 
 getInitialResponseButton.addEventListener('click', () => {
     getInitialResponseWithNet();
@@ -110,6 +119,15 @@ function createDocument(html) {
     return doc;
 }
 
+/*             ^^^^^^^^
+ @TODO </ need to get moved into the VM >
+ */
+
+
+//I think a lot of these can and should be deleted now
+//I was using them to develop the POST process but
+//now they're just taking up space.
+// I'm short on time so leaving here for now
 responseDocument = undefined;
 responseBody = undefined;
 requestHeaders = undefined;
@@ -122,34 +140,64 @@ requestChunk = '';
 axiosInstance = undefined;
 request = undefined;
 stat_agent = undefined;
+staticResponse = undefined;
 
-async function getInitialResponseWithNet() {
-    createNewUiEvent('getting initial web response');
-    responseCookie = undefined;
-    initialDoc = undefined;
-    request = undefined;
+async function getInitialResponseWithNet(shouldAwaitResponse) {
     stat_agent = superagent.agent();
-    request = stat_agent.get('https://www.bitchute.com/').buffer(true).withCredentials()
-    .then((res) => {
-        console.log(res.headers);
-        console.log(res.text);
-        console.log(res.status);
-        initialDoc = createDocument(res.text);
-        const cookie = res.headers['set-cookie'];
-        csrfMiddleWareTokenTextBox.value = initialDoc.getElementsByTagName('input').csrfmiddlewaretoken.value;
-        if (res.status === 200) {
-            createNewUiEvent('got objects from site');
+    event_generation.createNewUiEvent('getting initial web response');
+    var cookies = await session_state.getCookiesFromSession(true, stat_agent, true);
+    initialDoc = undefined;
+    request = stat_agent.get('https://www.bitchute.com/').buffer(true).withCredentials();
+    console.log(request);
+    if (shouldAwaitResponse) {
+        staticResponse = await request;
+        console.log(staticResponse.res.headers['set-cookie']);
+        console.log(staticResponse.res.status);
+        initialDoc = createDocument(staticResponse.res.text);
+        console.log(staticResponse.res.text);
+        responseCookie = staticResponse.res.headers['set-cookie'];
+        session_state.saveAllCookiesFromSetCookie(responseCookie);
+        csrfMiddleWareTokenTextBox.value = initialDoc.getElementsByTagName('input').csrfmiddlewaretoken.value; // @TODO move into VM
+        if (staticResponse.res.statusCode == 200) {
+            event_generation.createNewUiEvent('got objects from site');
+            if (initialDoc != null || undefined) {
+                try {
+                    for (i = 0; i < initialDoc.getElementsByClassName('dropdown-item spa').length; i++) {
+                        if (initialDoc.getElementsByClassName('dropdown-item spa')[i].innerText == 'Profile') {
+                            var p = i + 1;
+                            event_generation.raiseAnyEvent('loginEvent',initialDoc.getElementsByClassName('dropdown-item spa')[p].innerText);
+                            console.log(p);
+                            return;
+                        }
+                    }
+                }
+                 catch(err){
+                    console.log(err.message);
+                }
+            }
         }
-    });
+    } else {
+        request.then((res) => {
+            console.log(res.headers);
+            console.log(res.text);
+            console.log(res.status);
+            initialDoc = createDocument(res.text);
+            responseCookie = res.headers['set-cookie'];
+            session_state.saveAllCookiesFromSetCookie(responseCookie);
+            csrfMiddleWareTokenTextBox.value = initialDoc.getElementsByTagName('input').csrfmiddlewaretoken.value; // @TODO move to VM
+            if (res.status === 200) {
+                event_generation.createNewUiEvent('got objects from site');
+            }
+        }).catch((err) => { console.log(err.message); });
+    }
 }
 
-getInitialResponseWithNet();
+getInitialResponseWithNet(true);
 
 async function makeLoginRequest(username, password, csrfmiddlewaretoken, onetimecode) {
-    createNewUiEvent(`making login attempt`);
+    event_generation.createNewUiEvent(`making login attempt`);
     initialDocStore = createDocument(requestChunk);
     console.log(csrfmiddlewaretoken);
-    responseCookie = '';
     request = undefined;
     request = stat_agent.post('https://www.bitchute.com/accounts/login/')
         .set('Referer', 'https://www.bitchute.com/')
@@ -157,18 +205,23 @@ async function makeLoginRequest(username, password, csrfmiddlewaretoken, onetime
         .set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
         .withCredentials()
         .send(getLoginFormDataString(username, password, csrfmiddlewaretoken, onetimecode))
-        .buffer(true).then((res) => {
+        .buffer(true)
+    console.log(request);
+        request.then((res) => {
             console.log(res.text);
             console.log(res.status);
             console.log(res.headers);
+            staticResponse = res;
+            responseCookie = res.headers['set-cookie'];
+            session_state.saveAllCookiesFromSetCookie(responseCookie);
             if (res.text.match('"errors": "None"')) {
-                createNewUiEvent(`logged in as ${username}`);
+                event_generation.createNewUiEvent(`logged in as ${username}`);
             }
         }).catch((err) => {
             console.log(err);
             console.log(err.message);
             console.log(err.response);
-            createNewUiEvent(`error ${err.message} making login attempt`);
+            event_generation.createNewUiEvent(`error ${err.message} making login attempt`);
         });
 }
 
@@ -201,7 +254,7 @@ latestVideoUploadCsrfToken = '';
 
 
 async function getUploadTokenResponse() {
-    createNewUiEvent('getting upload token response');
+    event_generation.createNewUiEvent('getting upload token response');
     upTokenReq = stat_agent.get('https://www.bitchute.com/myupload/');
     uploadTokenRequest = upTokenReq;
     upTokenReq.buffer(true).withCredentials()
@@ -220,17 +273,17 @@ async function getUploadTokenResponse() {
             try {
                 console.log(res.headers);
             } catch (err) {
-                createNewUiEvent(`error ${err} getting upload token web response`);
+                event_generation.createNewUiEvent(`error ${err} getting upload token web response`);
             }
             latestVideoUploadCsrfToken = createDocument(res.text)
                 .getElementById('fileupload').getAttribute('data-form-data').split('\"')[3];
-            createNewUiEvent(`got upload token response for ${uploadLocation}`);
-            if (upTokenReq.url != null && upTokenReq != undefined) {
-                createNewProgressEvent(upTokenReq.url, 'vidToken');
+            event_generation.createNewUiEvent(`got upload token response for ${uploadLocation}`);
+            if (upTokenReq.url != null) {
+                event_generation.raiseAnyEvent('uploadTokenEvent', null, upTokenReq.url);
                 getUploadCodesFromUrlString(upTokenReq.url);
             }
             if (latestVideoUploadCsrfToken != '') {
-                createNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
+                event_generation.createNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
             }
         });
 }
@@ -307,14 +360,14 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
                     console.log(res.headers);
                 } catch (err) { console.log(err.message); }
                 if (res.status == 200) {
-                    createNewUiEvent(`uploaded metadata for video :${metapackage.upload_title}`);
+                    event_generation.createNewUiEvent(`uploaded metadata for video :${metapackage.upload_title}`);
                     uploadVideoData(uploadEndpointUrl, null, null, null, 'meta_finalize', metapackage);
                 }
             }).catch((err) => {
                 console.log(err);
                 console.log(err.message);
                 console.log(err.response);
-                createNewUiEvent(`error ${err.message} sending metadeta`);
+                event_generation.createNewUiEvent(`error ${err.message} sending metadeta`);
             });
 
     } else if (uploadType == 'meta_finalize') {
@@ -345,26 +398,19 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
                     console.log(res.status);
                     console.log(res.headers);
                 } catch (err) { console.log(err.message); }
-                try {
-                    console.log(res.response.body);
-                } catch {
-
-                }
+                try { console.log(res.response.body); }
+                catch { }
                 if (res.status == 200) {
-                    createNewUiEvent(`uploaded metadata for video :${metapackage.upload_title}`);
+                    event_generation.createNewUiEvent(`uploaded metadata for video :${metapackage.upload_title}`);
                 }
             }).catch((err) => {
                 console.log(err);
                 console.log(err.message);
                 console.log(err.response);
-                createNewUiEvent(`error ${err.message} finalizing video upload`);
+                event_generation.createNewUiEvent(`error ${err.message} finalizing video upload`);
             });
-    }
-    try {
-        createNewUiEvent(upVidReqResponseBody.toString());
-    } catch (err) {
-        createNewUiEvent(err.message);
-    }
+    } try { event_generation.createNewUiEvent(upVidReqResponseBody.toString());
+    } catch (err) {event_generation.createNewUiEvent(err.message); }
 }
 
 function getEndpointForStep(endpointRoot, step) {
@@ -448,95 +494,6 @@ function getJsonMetaDataString(csrfmiddlewaretoken, uploadTitle, uploadDescripti
     } catch{ }
 }
 
-document.addEventListener('newProgressEvent', (event) => {
-    if (event.detail.sendTo == 'vidToken') {
-        //if (event.detail.data.match('?upload_code=')) {
 
-        //}
-
-    }
-});
-
-let staticResponse = undefined;
-
-function endpointIsBitChute(url) {
-    try {
-        if ((url.toString().split('.')[1] === 'bitchute') && url.toString().split('.')[2].startsWith('com/')) {
-            return true;
-        }
-    }
-    catch (err) { diag.writeToDiagnosticText(err.message); return false; }    
-    return false;
-}
-
-function getCookieString() {
-    var cookieString = '';
-
-    if (cfduidCookie != '') {
-
-    }
-    if (csrfTokenCookie != '') {
-
-    }
-    if (sessionIdCookie != '') {
-
-    }
-    if (csrfMiddleWareToken != '') {
-
-    }
-    return cookieString;
-}
-
-csrfMiddleWareToken = '';
-cfduidCookie = '';
-csrfTokenCookie = '';
-sessionIdCookie = '';
-
-/**
- * 
- * @param {any} localDataPath
- * @param {any} type
- * @param {any} config
- * @param {any} url
- */
-
-async function postData(localDataPath, type, config, url) { 
-    var formData = new FormData();
-    if (type === 'video' || 'thumbnail') {
-        formData.append('file', fs.createReadStream(localDataPath));
-    } else { formData.append('file', localDataPath) }
-    var rescon = [];
-}
-
-function createNewUiEvent(msg) {
-    var uiEvent = new CustomEvent(
-        "newUiEvent",
-        {
-            detail: {
-                message: msg
-            },
-            bubbles: true,
-            cancelable: true
-        }
-    );
-    document.dispatchEvent(uiEvent);
-    return uiEvent;
-}
-
-function createNewProgressEvent(data, sendTo) {
-    var progEvent = new CustomEvent(
-        "newProgressEvent",
-        {
-            detail: {
-                data: data,
-                sendTo: sendTo
-            },
-            bubbles: true,
-            cancelable: true
-        }
-    );
-    document.dispatchEvent(progEvent);
-    return progEvent;
-}
 
 

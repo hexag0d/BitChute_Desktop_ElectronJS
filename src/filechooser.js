@@ -63,10 +63,11 @@ function showXPlatformChooser(types, label, sendTo) {
             title: global.localVidChooserLabel,
             defaultPath: path.join(__dirname, '../assets/'),
             buttonLabel: localUpload,
-            filters: [{
-                name: global.localFiles,
-                    extensions: ['txt', 'docx']
-                },],
+            filters: [{ name: global.localFiles, extensions: [types] },],
+            //filters: [{
+            //    name: global.localFiles,
+            //        extensions: ['avi', 'mp4', 'mov'] //I'm not sure if mov is actually supported by ffmpeg?
+            //    },],
             properties: ['openFile', 'openDirectory'] 
         }).then(file => { // @TODO someone with a mac needs to test this @hexagod
             console.log(file.canceled);

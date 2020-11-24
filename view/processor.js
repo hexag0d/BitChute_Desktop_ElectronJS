@@ -1,7 +1,12 @@
 /*
- * This file should be temporary.  We need to quickly determine which databinding
- * library we're going to use.  This isn't a longterm viable way of handling the UI.
- * I am thinking about using ReactJS but haven't made the final decision yet.
+ * I haven't ported the app to MVVM yet due to time constraints
+ * and making the decision.  I'm thinking Vue.js would be a 
+ * good framework to use.  I'll be finishing up baseline functionality
+ * then immediately switching this type of UI model to databinding
+ * 
+ * I was first trying to get the app usable so that I can post videos
+ * and after it's useable no more features until the UI and Models
+ * are seperate.
  * 
  * Right now, the js UI objects will be grouped by screen.  
  * The main reason I haven't already started bringing this app onto
@@ -42,17 +47,4 @@ getUploadTokenButton = document.getElementById('GetUploadTokenButton');
 loginDiagnosticTextBox = document.getElementById('LoginDiagnosticTextBox');
 postingLocationTextBox = document.getElementById('PostingLocationTextBox');
 
-writeToLogin = function writeToLoginDiag(msg) {
-    loginDiagnosticTextBox.value = msg.toString();
-}
-
-document.addEventListener('newUiEvent', (event) => { writeToLogin(event.detail.message); });
-document.addEventListener('newProgressEvent', (event) => {
-    if (event.detail.sendTo == 'vidToken') {
-        postingLocationTextBox.value = event.detail.data;
-        writeToLogin(`got video auth path :` + '\n' + `${event.detail.data}`);
-    }
-    else if (event.detail.sendTo == 'csrfMiddleWareTokenTextBox') {
-        csrfMiddleWareTokenTextBox.value = event.detail.data;
-    }
-});
+curUserTb = document.getElementById('CurrentUserTextBox');
