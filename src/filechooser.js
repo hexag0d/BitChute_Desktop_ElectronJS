@@ -14,14 +14,6 @@ module.exports = {
     showXPlatformChooser
 }
 
-chooseVideoFileButton.addEventListener('click', () => {
-    showXPlatformChooser(null, null, 'videoUploadSource');
-})
-
-chooseThumbnailButton.addEventListener('click', () => {
-    showXPlatformChooser(null, null, 'thumbnailUploadSource');
-})
-
 generalStaticFilePath = '';
 temFile = undefined;
 
@@ -40,6 +32,10 @@ function showXPlatformChooser(types, label, sendTo) {
                 console.log(file.filePaths[0]);
                 if (sendTo == 'thumbnailUploadSource') { // no sendto set, return string immediately
                     onThumbnailChosen(file.filePaths[0]);
+                    return;
+                }
+                else if (sendTo == 'videoProcessorSource') {
+                    onVideoSourceChosen(file.filePaths[0], true);
                     return;
                 }
                 else if (sendTo == 'videoUploadSource') { //sendto video upload source
@@ -77,7 +73,11 @@ function showXPlatformChooser(types, label, sendTo) {
                     onThumbnailChosen(file.filePaths[0]);
                     return;
                 }
-                else if (sendTo == 'videoUploadSource') { 
+                else if (sendTo == 'videoProcessorSource') {
+                    onVideoSourceChosen(file.filePaths[0], true);
+                    return;
+                }
+                else if (sendTo == 'videoUploadSource') {
                     onVideoSourceChosen(file.filePaths[0]);
                     return;
                 }
@@ -95,10 +95,14 @@ function showXPlatformChooser(types, label, sendTo) {
     }
 }
 
-function onVideoSourceChosen(vid_path) {
+function onVideoSourceChosen(vid_path, encodeFile) {
     diag.writeToDebug(global.localVideoSourceSelected + '\n' + vid_path);
-    videoProcessorSourceTextBox.value = vid_path;
-    video_encoder.encodeFile(vid_path);
+    if (encodeFile) {
+        videoProcessorSourceTextBox.value = vid_path;
+        video_encoder.encodeFile(vid_path);
+    } else {
+        processedVideoTextBox.value = vid_path;
+    }
 }
 
 function onThumbnailChosen(file_path) {

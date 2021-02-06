@@ -24,6 +24,7 @@ videoProcessorProgressBar = document.getElementById('VideoProcessorProgressBar')
 //file choosing
 chooseVideoFileButton = document.getElementById('ChooseVideoFile');
 chooseThumbnailButton = document.getElementById('ChooseThumbnailButton');
+selectPreProcessedFileButton = document.getElementById('SelectPreProcessedFileButton');
 
 thumbnailImage = document.getElementById('UploadThumbnailImage');
 
@@ -33,6 +34,8 @@ videoProcessorSourceTextBox = document.getElementById('VideoProcessorSourceTextB
 //upload
 uploadVideoButton = document.getElementById('UploadVideoButton');
 uploadThumbnailButton = document.getElementById('UploadThumbnailButton');
+upProgBar = document.getElementById('VideoUploadProgressBar');
+thumbnailUploadProgressBar = document.getElementById('ThumbnailUploadProgressBar');
 
 endpointTextBox = document.getElementById('EndpointUrlTextBox');
 processedVideoTextBox = document.getElementById('ProcessedFileTextBox');
@@ -46,5 +49,12 @@ getInitialResponseButton = document.getElementById('GetInitialResponseButton');
 getUploadTokenButton = document.getElementById('GetUploadTokenButton');
 loginDiagnosticTextBox = document.getElementById('LoginDiagnosticTextBox');
 postingLocationTextBox = document.getElementById('PostingLocationTextBox');
+
+logoutButton = document.getElementById('LogoutButton');
+
+videoProcessorWidthTextBox = document.getElementById('ProcessToWidthTextBox')
+videoProcessorHeightTextBox = document.getElementById('ProcessToHeightTextBox')
+videoProcessorVideoBitRateTextBox = document.getElementById('ProcessToVideoBitRateTextBox')
+videoProcessorAudioBitRateTextBox = document.getElementById('ProcessToAudioBitRateTextBox')
 
 curUserTb = document.getElementById('CurrentUserTextBox');

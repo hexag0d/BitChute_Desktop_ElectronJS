@@ -3,31 +3,45 @@
  * but may eventually prove useful @hexagod
  */
 
+debugLocalApp = true;
 //bitchute.com settings
 
-var userDonationSupportLevel = 'none';
+
+module.exports = {
+    _vblg,
+    getAppLanguageSetting,
+    debugLocalApp
+}
+
+userDonationSupportLevel = 'none';
 
 // end bitchute settings
 
 //begin video settings 
-//$(document).ready(() => {
-//    document.addEventListener('videoEncoderSettingChanged', onVideoEncoderSettingChanged);
-//});
 
-//function onVideoEncoderSettingChanged(event) {
-
-//}
-
-videoEncoderSettingResolution = '854x480'; 
+videoEncoderSettingVideoFilters = [
+    {
+     filter: 'scale',
+     options: '-2:480'
+    },
+    {
+     filter: 'format',
+     options: 'yuv420p'
+    }
+];
 
 videoEncoderSettingAudioBitrate = '96k';
-videoEncoderSettingVideoBitrate = '213k';
+videoEncoderSettingVideoBitrate = '288k';
+videoEncoderSettingVideoFPS = '30';
+
+videoEncoderOutputExtension = '.mp4';
 
 supportedVideoTypes = 'avi', 'mov', 'mp4'; //there are probably more, but just for now
 
 //end video settings  
 
 //begin app settings 
+useSiteVideoEncodingSettings = false;
 
 /**
  * if no arg passed returns the current setting
@@ -35,15 +49,20 @@ supportedVideoTypes = 'avi', 'mov', 'mp4'; //there are probably more, but just f
  */
 function _vblg(toggleOn) {
     if (toggleOn == undefined) {
-        return _v_lgng;
+        return _vb_log;
     }
 }
 
-//should app log with verbosity, disable this on release
-var _v_lgng = true; // I made var name shorter because it'll get queried a lot
-                    // unlike c# I think having a bunch of long var names slows down the app?
-                    // maybe not?  you tell me @hexagod
+/*
+ * verbose logging defaults to the state of "debugLocalApp"
+ * debug local app setting is more for programmatic forks versus logging changes
+ */
+_vb_log = debugLocalApp; // vebose logging enabled, need to put all of the console.log behind this bool
+
                 
+function getAppLanguageSetting() {
+    return appLanguageSetting;
+}
 
 appLanguageSetting = 'eng'; 
 

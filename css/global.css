@@ -1,6 +1,6 @@
 body {
     background: black;
-    font: 18px Arial, sans-serif;
+    font: 16px Arial, sans-serif;
     color: white;
     height: 100%;
 }
@@ -22,8 +22,9 @@ input {
 }
 
 button {
-    color:white;
-    background:black;
+    color: white;
+    background: black;
+    font-size: 16px;
 }
 
 textarea {
@@ -34,7 +35,7 @@ textarea {
 
 progress {
     background-color:black;
-    color: chartreuse;
+    color: red;
 }
 
 .float-container {
@@ -44,13 +45,13 @@ progress {
 .MainColumnLeft {
     width: 42%;
     float: left;
-    padding: 20px;
+    padding: 1%;
 }
 
 .MainColumnRight {
     width: 50%;
     float: right;
-    padding: 20px;
+    padding: 1%;
 }  
 
 .PageFooter {

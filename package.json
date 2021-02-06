@@ -11,7 +11,7 @@
     "electron",
     "ffmpeg"
   ],
-  "author": "GitHub",
+  "author": "BitChute Ltd, hexagod, Nilkinom",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^9.1.1",
@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
-    "axios": "^0.19.2",
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^3.0.0",
     "jquery": "^3.5.1",

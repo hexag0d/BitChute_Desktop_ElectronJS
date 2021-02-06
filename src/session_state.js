@@ -8,7 +8,8 @@ var custom_events = require('../vm/event_generators.js')
 module.exports = {
     buildCookie,
     getCookiesFromSession,
-    saveAllCookiesFromSetCookie
+    saveAllCookiesFromSetCookie,
+    clearCookies
 }
 
 /**
@@ -53,11 +54,13 @@ function castFromSessionToCookie(cookieJson) {
  * @param {super_agent_type} agent optional superagent instance to add request headers
  */
 
+reqcookie = undefined;
+
 async function getCookiesFromSession(onInitialLoad, agent, shouldAwaitResponse) {
     var sessionStillValid = false;
     var freshCookies = undefined;
     var req = session.defaultSession.cookies.get({ url: 'https://www.bitchute.com/' });
-
+    reqcookie = req;
     if (shouldAwaitResponse) {
         cookies = await req;
         console.log(cookies);
@@ -176,6 +179,12 @@ function saveAllCookiesFromSetCookie(cookieArray) {
             } catch (err) { console.log(err);}
         }
     }
+}
+
+function clearCookies() {
+    session.defaultSession.cookies.remove('https://www.bitchute.com', 'sessionid');
+    session.defaultSession.cookies.remove('https://www.bitchute.com', '__cfduid');
+    session.defaultSession.cookies.remove('https://www.bitchute.com', 'csrftoken');
 }
 
 /*

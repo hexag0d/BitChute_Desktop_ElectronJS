@@ -13,10 +13,13 @@ const url = require('url')
 const fs = require('fs')
 
 const { event_keys } = require('./constants')
-const app_setting = require('./settings')
+const app_setting = require('./settings.js')
 
 let mainWindow;
 
+module.exports = {
+
+}
 
 function createWindow() {
 
@@ -41,8 +44,10 @@ function createWindow() {
         protocol: 'file:',
         slashes: true
     }))
-    
-    mainWindow.webContents.openDevTools()  // @DEBUG
+
+    if (app_setting.debugLocalApp) {
+        mainWindow.webContents.openDevTools()  // @DEBUG
+    }
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time

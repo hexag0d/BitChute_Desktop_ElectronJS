@@ -9,63 +9,109 @@
     </style>-->
 </head>
 <body>
-    <div class="float-container">
+    <div class="float-container" style="height:100%">
         <div class="MainColumnLeft">
-            <h1>
-                <img alt="" src="rsrc/signage/logo_bronze.png" style="object-fit:contain; width:46%; "/><a id="ElectronAppLabel">.ElectronJS a.</a>11
+            <h1 style="margin-top:0px">
+                <img alt="" src="rsrc/signage/logo_bronze.png" style="object-fit:contain; width:46%; "/><a id="ElectronAppLabel">.ElectronJS a.</a>15
             </h1>
+      <div id="UploadAndProcessingContainer" style="border: thin outset #808080;">
+
             <div id="async-msg">
-                <div style="float: right; width: 100%; height: 82px;">
-                    <br />
-                    <br />
+                <div style="width: 100%; ">
                     Select a file:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
                     &nbsp;
-             <button id="ChooseVideoFile">video to encode</button><input type="text" id="VideoProcessorSourceTextBox" style="width: 26%" /><div style="float: right; width: 45%; display: block; margin-left: 0px;">
-                    <progress id="VideoUploadProgressBar" value="0" max="100" style="width:100%; display:none;"></progress>
+             <button id="ChooseVideoFile">video to encode</button><input type="text" id="VideoProcessorSourceTextBox" style="width: 26%" />
+                <div style="float: right; width: 45%; display: block; margin-left: 0px;">
+                    <progress id="VideoProcessorProgressBar" value="0" max="100" style="width:100%; display:none;"></progress>
                 </div>
+             <br />
+             <button id="StopVideoProcessingButton" style="margin:5px; display: none;">stop</button>
+                </div>
+                <br />
+            </div>
+            <div style="width:100%">
+                <div style="float:left;width:50%;height:134px">
+                    Processing Status<br />
+                    <textarea id="DebugStatusTextBox" name="text" style="width:90%; height:80%;"></textarea>
+                </div>
+                <div style="border: thin outset #808080;float:right;width:48%">
+
+                    Width:<input id="ProcessToWidthTextBox" type="text" style="width:25%" disabled="disabled"/> px<input id="UseSiteEncoderSettingsCheckBox" type="checkbox" checked="" disabled="disabled" />use site<br />
+                    Height:<input id="ProcessToHeightTextBox" type="text" style="width:25%" disabled="disabled"/> px<br />
+                    Video
+                    Format:
+                    <select id="VideoFormatSelectBox" name="D1">
+                        <option>-2:480</option>
+                        <option>-2:360</option>
+                    </select><br />
+                    Video Bitrate:<input id="ProcessToVideoBitRateTextBox" type="text" style="width:25%" /> kbps<br />
+                    Audio Bitrate:
+                    <select id="ProcessToAudioBitRateSelectBox" name="D2">
+                        <option>96</option>
+                        <option>128</option>
+                        <option>160</option>
+                        <option>192</option>
+                        <option>256</option>
+                        <option>320</option>
+                    </select> kbps
+
+                    <br />
+                    FPS:
+                    <input id="ProcessToVideoFpsSelectBox" type="text" style="width:25%"/><br />
+
+                    <br />
 
                 </div>
+                    
             </div>
-             &nbsp;<br />
-            Processing Status:<textarea id="DebugStatusTextBox" name="text" style="width:90%; height: 78px"></textarea>
-            <div style="width: 100%">
+
+          <div style="display:flex;width:100%">
+                          <hr style="width:100%" />
+          </div>
+
+            <div>
+            <div style="width: 100%;padding:1%;display:flex">
 
             <div style="float: left; width: 45%; height: 20%">
-                <button id="UploadVideoButton" value="Upload">upload</button><input id="ProcessedFileTextBox" type="text" style="width: 70%" /></div>
-                <div style="float: right; width: 50%; display: none;">
-                    <progress id="VideoProcessorProgressBar" value="0" max="100" style="width:100%; display:block;"></progress>
+                <button id="UploadVideoButton" value="Upload">upload</button><input id="ProcessedFileTextBox" type="text" style="width: 40%" />
+                <input id="SelectPreProcessedFileButton" style="width: 25%" type="button" value="raw" />
+            </div>
+            <div style="float: right; width: 45%;">
+                    <progress id="VideoUploadProgressBar" value="0" max="100" style="width:100%; display:none;"></progress>
                 </div>
 
             </div>
             
-                &nbsp;
-            <div style="width: 100%; height: 87px;">
+            <div style="width: 100%; display:flex ">
 
-                &nbsp;<div style="width: 40%; float: right">
-
-                        <input id="AutoPostVideoAfterProcessedCheckBox" type="checkbox" style="width: 5%" /> Auto Upload After Processing
-
-                      </div>
                 <div style="float: left; width: 55%">
-
-                &nbsp;<div style="width: 50%; float: right; padding: 10px">
+                &nbsp;
+                    <div style="width: 50%; float: right; padding: 10px">
                         <input id="PublishNowCheckBox" type="checkbox" style="width: 9%" />&nbsp; Publish Now?&nbsp;&nbsp;&nbsp;</div>
                     <div style="float: left; width: 40%">
-
-                <input id="PostVideoFinalButton" type="button" value="Post Video" style="width: 100%" /></div>
+                        <input id="PostVideoFinalButton" type="button" value="Post Video" style="width: 100%" />
+                    </div>
                 </div>
+                <div style="width: 40%; float: right">
+                    
                 <input id="GetUploadTokenButton" type="button" value="Get Upload Token" /><br />
-                <br />
-                <br />
-                <br />
+                        <input id="AutoPostVideoAfterProcessedCheckBox" type="checkbox" style="width: 5%" /> Auto Upload After Processing
+
+                </div>
             </div>
-            <div style="height: 30%; width: 100%; margin-left: 0px; margin-bottom: 0px;border: solid grey; display: none;">
+            </div>
+
+      </div>
+            <div>
+
+            </div>
+            <!--div style="height: 30%; width: 100%; margin-left: 0px; margin-bottom: 0px;border: solid grey; display: none;">
                 Debugging tools (advanced users only):<br />
                 Https Diag:<br />
                 <textarea id="HttpsDiagnosticTextBox" name="text" style="height: 30%; width:80%"></textarea>
            
-            </div>
-            <div style="border: thin outset #808080; padding: 10px; ">
+            </div-->
+            <div style="border: thin outset #808080; padding: 10px; width:100%;display:flex;margin-top:8px">
                 &nbsp;
                 <div style="border: thin outset #808080; padding: 10px; float: left; width: 36%; height: 69%;">
                     Username: 
@@ -78,13 +124,15 @@
                     <br />
                     <input id="GetInitialResponseButton" type="button" value="Retry Initial Response" /><br />
                 </div>
-                &nbsp;<div id="token-container" style="border: thin outset #808080; padding: 10px; width: 40%; float: right; height: 112px;">
+                &nbsp;
+                <div id="token-container" style="border: thin outset #808080; margin-left:8px; padding: 10px; width: 40%; float: right;height:auto">
                     CSRFmwToken: <input id="CsrfMiddleWareTokenTextBox" type="text" />
                     <br />
                     Upload Token:<input id="UploadTokenTextBox" type="text" /><br />
-                    Posting Url:<input id="PostingLocationTextBox" class="large-input" style="width: 50%; margin-bottom: 1px;" type="text" /><input id="LoginDiagnosticTextBox" style="width: 90%; height: 21px" type="text" />
-
-                      </div>
+                    Posting Url:<input id="PostingLocationTextBox" class="large-input" style="width: 50%; margin-bottom: 1px;" type="text" /><br />
+                    Status:<br />
+&nbsp;<input id="LoginDiagnosticTextBox" style="width: 90%; height: 21px" type="text" />
+                    <input id="OpenDevConsoleButton" type="button" value="Open Dev Console" style="display: none" /></div>
                 <br />
                 <br />
                 <br />
@@ -92,9 +140,8 @@
                 <br />
             </div>
         </div>
-    </div>
-    <div class="MainColumnRight">
-        <div class="MetaOptionDiv">
+            <div class="MainColumnRight" style="float:right;display:flex;height:100%">
+        <div class="MetaOptionDiv" style="height:100%">
             <div style="height: 182px">
                 <div style="float: left; width: 64%; margin-top: 0px; ">
                     Title<br />
@@ -102,27 +149,100 @@
             Description<br />
             <textarea id="DescriptionText" style="width:100%" name="S1" rows="6" cols="20"></textarea></div>
                 <div style="float: right; width: 30%; height: 100%;">
-                    Logged In As:<input id="CurrentUserTextBox" style="width: 100%; height: 31px;" type="text" /><br />
+                    Logged In As:<input id="CurrentUserTextBox" style="width: 100%; height: 31px;" type="text" disabled="disabled" /><br />
                     <div id="donation-container" style="display:none">
                     Consider making a donation to support freespeech content<br />
                     <input id="MakeADonationButton" style="border-width: medium; border-color: #808000; font-size: 18px; width: 58%; height: 30%" type="button" value="Donate" />
                     </div>
-                </div>
+                    <input id="LogoutButton" type="button" value="Logout" /> &nbsp 
                     <br />
-                <br />
+                    Finished list:<br />
+                    <textarea id="SuccessfulUploadListBox" cols="12" name="S2" rows="2" style="width:100%;height:30%"></textarea><br />
           &nbsp;<br />
                 <br />
+                            </div>
             </div>
             <div style="">
                 <img id="UploadThumbnailImage" alt="" src="rsrc/signage/video_thumbnail_placeholder.jpg" style="width:100%;object-fit:cover;" /><br />
-            </div>
+
             <br />
-            <button id="ChooseThumbnailButton">thumbnail</button><input id="ThumbnailSourceText" type="text" /><button id="UploadThumbnailButton">upload</button>
-        </div>
+
+                <div style="margin:2%">
+                                <button id="ChooseThumbnailButton">thumbnail</button><input id="ThumbnailSourceText" type="text" /><button id="UploadThumbnailButton">upload</button><progress id="ThumbnailUploadProgressBar" value="0" max="100" style="width:32%; display:none;"></progress>
+                            <br />
+                            <br />
+                   <div>
+                         
+                                    Content Sensitivity:
+                        <select id="VideoContentRatingSelectBox" name="D3">
+                            <option>Normal - 16 yrs old and up</option>
+                            <option>NSFW - 18 yrs old and up</option>
+                            <option>NSFL - extremely graphic content</option>
+                        </select>&nbsp;&nbsp;
+                                                           Content Category:
+                        <select id="VideoCategorySelectBox" name="D4">
+
+  <option value="11" selected="">None - No Category Listing</option>
+
+  <option value="14">Anime &amp; Animation</option>
+
+  <option value="19">Arts &amp; Literature</option>
+
+  <option value="20">Auto &amp; Vehicles</option>
+
+  <option value="17">Beauty &amp; Fashion</option>
+
+  <option value="3">Business &amp; Finance</option>
+
+  <option value="13">Cuisine</option>
+
+  <option value="18">DIY &amp; Gardening</option>
+
+  <option value="6">Education</option>
+
+  <option value="12">Entertainment</option>
+
+  <option value="2">Gaming</option>
+
+  <option value="4">Health &amp; Medical</option>
+
+  <option value="5">Music</option>
+
+  <option value="1">News &amp; Politics</option>
+
+  <option value="15">People &amp; Family</option>
+
+  <option value="16">Pets &amp; Wildlife</option>
+
+  <option value="7">Science &amp; Technology</option>
+
+  <option value="9">Spirituality &amp; Faith</option>
+
+  <option value="8">Sports &amp; Fitness</option>
+
+  <option value="21">Travel</option>
+
+  <option value="10">Vlogging</option>
+
+                        </select>
+
+                                    <br />
+                                    hashtags:
+                                    <input id="VideoHashtagsTextBox" style="width: 80%" type="text" /></div>
+                </div>
+
+            </div>
+
+      </div>
     </div>
+    </div>
+
     <div class="PageFooter">
     </div>
     <script>
+        require('./src/app_strings.js')
+        require('./settings.js')
+        require('./languagesupport.js').setLocalStrings(require('./settings.js').getAppLanguageSetting())
         require('./index.js')
         require('./view/processor.js')
         require('./src/filechooser.js') 
@@ -131,7 +251,6 @@
         require('./src/session_state.js')
         require('./vm/processor_viewmodel.js')
         require('./vm/event_generators.js')
-        require('./settings.js')
     </script>
 </body>
 </html>

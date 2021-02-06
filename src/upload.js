@@ -46,82 +46,31 @@ const querystring = require('querystring');
 const https = require('https');
 const superagent = require('superagent');
 const event_generation = require('../vm/event_generators.js');
+const settings = require('../settings.js');
 
+var vblog = require('../settings.js')._vblg;
 
 var diag = require('./diagnostic.js')
 var endpoints = require('./endpoints.js')
 const fs = require('fs')
 
-/*
- @TODO These all need to get moved into the VM
-                vvvvvvvvvvvv
- */           
-uploadVideoButton.addEventListener('click', () => {
-    if (global.processedVideoTextBox.value == '' || !global.processedVideoTextBox.value) {
-        alert(global.localNoFileSelected); return;
-    }
-    uploadVideoData(postingLocationTextBox.value,
-        processedVideoTextBox.value,
-        csrfMiddleWareTokenTextBox.value,
-        latestVideoUploadCode, 'video');
-})
+module.exports = {
+    getUploadTokenResponse,
+    uploadVideoData,
+    getJsonMetaData,
+    resetUploadValues,
+    generateCompletedUploadUrl,
+    makeLoginRequest,
+    getInitialResponseWithNet,
+    getJsonMetaDataForVideoDetail
+}
 
-uploadThumbnailButton.addEventListener('click', () => {
-    if (global.thumbnailSourceTextBox.value == '' || !global.thumbnailSourceTextBox.value) {
-        alert(global.localNoFileSelected); return;
-    }
-    uploadVideoData(
-        postingLocationTextBox.value,
-        thumbnailSourceTextBox.value,
-        csrfMiddleWareTokenTextBox.value,
-        latestVideoUploadCode, 'image');
-})
-
-document.getElementById('PostVideoFinalButton').addEventListener('click', () => {
-    var urlStringParts = postingLocationTextBox.value.split('&');
-    uploadVideoData(postingLocationTextBox.value,
-        null,
-        null,
-        null,
-        'meta',
-        getJsonMetaData(
-            csrfMiddleWareTokenTextBox.value,
-            document.getElementById('TitleTextInput').value,
-            document.getElementById('DescriptionText').value,
-            latestVideoUploadCode,
-            urlStringParts[urlStringParts.length - 2],
-            urlStringParts[urlStringParts.length - 1],
-            10, //@TODO add sensitivity.. It's ALL safe for work now baby!
-            document.getElementById('PublishNowCheckBox').checked,
-            false
-        ));
-
-})
-
-getInitialResponseButton.addEventListener('click', () => {
-    getInitialResponseWithNet();
-})
-
-getUploadTokenButton.addEventListener('click', () => {
-    getUploadTokenResponse();
-})
-
-loginButton.addEventListener('click', () => {
-    passwordTextBox.value;
-    userNameTextBox.value;
-    csrfMiddleWareTokenTextBox.value;
-    makeLoginRequest(userNameTextBox.value, passwordTextBox.value, csrfMiddleWareTokenTextBox.value, '');
-})
 
 function createDocument(html) {
     var doc = document.implementation.createHTMLDocument('new doc');
     doc.documentElement.innerHTML = html;
     return doc;
 }
-
-/*             ^^^^^^^^
- @TODO </ need to get moved into the VM >
- */
 
 
 //I think a lot of these can and should be deleted now
@@ -171,7 +120,7 @@ async function getInitialResponseWithNet(shouldAwaitResponse) {
                         }
                     }
                 }
-                 catch(err){
+                catch(err){
                     console.log(err.message);
                 }
             }
@@ -190,7 +139,7 @@ async function getInitialResponseWithNet(shouldAwaitResponse) {
             }
         }).catch((err) => { console.log(err.message); });
     }
-}
+} // catch Uncaught (in promise) Error: getaddrinfo ENOTFOUND www.bitchute.com = no internet
 
 getInitialResponseWithNet(true);
 
@@ -216,6 +165,7 @@ async function makeLoginRequest(username, password, csrfmiddlewaretoken, onetime
             session_state.saveAllCookiesFromSetCookie(responseCookie);
             if (res.text.match('"errors": "None"')) {
                 event_generation.createNewUiEvent(`logged in as ${username}`);
+                event_generation.raiseAnyEvent(`loginEvent`, `${username}`);
             }
         }).catch((err) => {
             console.log(err);
@@ -252,40 +202,94 @@ latestVideoUploadDomainPath = '';
 latestVideoUploadFullyQualifiedUrl = '';
 latestVideoUploadCsrfToken = '';
 
+uploadTokenRequestInProgress = false;
+videoUploadInProgress = false;
+thumbnailUploadInProgress = false;
+metaUploadInProgress = false;
+videoUploadContentRating = 10;
 
-async function getUploadTokenResponse() {
-    event_generation.createNewUiEvent('getting upload token response');
-    upTokenReq = stat_agent.get('https://www.bitchute.com/myupload/');
-    uploadTokenRequest = upTokenReq;
-    upTokenReq.buffer(true).withCredentials()
-        .set('Connection', 'keep-alive').redirects(1)
-        .then((res) => {
-            uploadTokenResponse = res.headers;
-            try {
-                console.log(res.headers);
-                console.log(upTokenReq.response.headers["location"]);
-                console.log(upTokenReq.response.headers);
-            } catch{}
-            try {
-                console.log(res.status);
-                console.log(res.text);
-            } catch { }
-            try {
-                console.log(res.headers);
-            } catch (err) {
-                event_generation.createNewUiEvent(`error ${err} getting upload token web response`);
+async function getUploadTokenResponse(returnToken) {
+    upTokenReq = undefined;
+    if (!uploadTokenRequestInProgress) {
+        if (videoUploadInProgress || thumbnailUploadInProgress) {
+            alert(`a video or image upload is already in progress`);
+        }
+        event_generation.createNewUiEvent('getting upload token response');
+        upTokenReq = stat_agent.get('https://www.bitchute.com/myupload/');
+        if (!settings.debugLocalApp) { uploadTokenRequestInProgress = true; }
+        uploadTokenRequest = upTokenReq;
+        upTokenReq.buffer(true).withCredentials().set('Connection', 'keep-alive').redirects(2);
+        if (_vb_log) { console.log(upTokenReq); }
+        if (!returnToken) {
+            upTokenReq.then((res) => {
+                uploadTokenRequestInProgress = false;
+                uploadTokenResponse = res.headers;
+                try {
+                    console.log(res.headers);
+                    console.log(upTokenReq.response.headers["location"]);
+                    console.log(upTokenReq.response.headers);
+                } catch{ }
+                try {
+                    console.log(res.status);
+                    console.log(res.text);
+                } catch { }
+                try {
+                    console.log(res.headers);
+                } catch (err) {
+                    if (_vb_log) {
+                        console.log(res);
+                        console.log(err);
+                    }
+                    event_generation.createNewUiEvent(`error ${err} getting upload token web response`);
+                }
+                latestVideoUploadCsrfToken = createDocument(res.text)
+                    .getElementById('fileupload').getAttribute('data-form-data').split('\"')[3];
+                event_generation.createNewUiEvent(`got upload token response for ${uploadLocation}`);
+                if (upTokenReq.url != null) {
+                    event_generation.raiseAnyEvent('uploadTokenEvent', null, upTokenReq.url);
+                    getUploadCodesFromUrlString(upTokenReq.url);
+                }
+                if (latestVideoUploadCsrfToken != '') {
+                    event_generation.raiseNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
+                }
+            }).catch((err) => {
+                uploadTokenRequestInProgress = false;
+                console.log(err);
+            });
+        } else {
+            var res = await upTokenReq;
+                uploadTokenRequestInProgress = false;
+                uploadTokenResponse = res.headers;
+                try {
+                    console.log(res.headers);
+                    console.log(upTokenReq.response.headers["location"]);
+                    console.log(upTokenReq.response.headers);
+                } catch{ }
+                try {
+                    console.log(res.status);
+                    console.log(res.text);
+                } catch { }
+                try {
+                    console.log(res.headers);
+                } catch (err) {
+                    event_generation.createNewUiEvent(`error ${err} getting upload token web response`);
+                }
+                latestVideoUploadCsrfToken = createDocument(res.text)
+                    .getElementById('fileupload').getAttribute('data-form-data').split('\"')[3];
+                event_generation.createNewUiEvent(`got upload token response for ${uploadLocation}`);
+                if (upTokenReq.url != null) {
+                    event_generation.raiseAnyEvent('uploadTokenEvent', null, upTokenReq.url);
+                    getUploadCodesFromUrlString(upTokenReq.url);
+                }
+                if (latestVideoUploadCsrfToken != '') {
+                    event_generation.raiseNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
             }
-            latestVideoUploadCsrfToken = createDocument(res.text)
-                .getElementById('fileupload').getAttribute('data-form-data').split('\"')[3];
-            event_generation.createNewUiEvent(`got upload token response for ${uploadLocation}`);
-            if (upTokenReq.url != null) {
-                event_generation.raiseAnyEvent('uploadTokenEvent', null, upTokenReq.url);
-                getUploadCodesFromUrlString(upTokenReq.url);
-            }
-            if (latestVideoUploadCsrfToken != '') {
-                event_generation.createNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
-            }
-        });
+            return upTokenReq.url;
+        }
+    }
+    if (upTokenReq != undefined && _vb_log) {
+        console.log(upTokenReq);
+    } 
 }
 
 function getUploadCodesFromUrlString(qString) {
@@ -301,86 +305,85 @@ function getUploadCodesFromUrlString(qString) {
 staticVideoUploadResult = undefined;
 staticJsonMetaPackage = undefined;
 
-function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadcode, uploadType, metapackage) {
+function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadcode, uploadType, metapackage, remoteVideoPath) {
+    if (uploadType == 'video' && videoUploadInProgress) {
+        alert('video upload is already in progress');
+        return;
+    } else if (uploadType == 'image' && thumbnailUploadInProgress) {
+        alert('thumbnail (image) upload is already in progress');
+        return;
+    }
     var simpleEndpoint = uploadEndpointUrl.split('?upload')[0];
     if (metapackage != undefined) {
         simpleEndpoint = simpleEndpoint.split('/upload/')[0];
     }
+    var evType = 'uploadProgress';
     console.log(fname);
+    if (uploadcode == undefined) {
+        uploadcode = latestVideoUploadCode;
+    }
     if (uploadType == 'video' || uploadType == 'image') {
         var fname = localFilePath.split('/');
         fname = fname[(fname.length - 1)];
+        if (uploadType == 'video') {
+            videoUploadInProgress = true;
+        } else if (uploadType == 'image') {
+            thumbnailUploadInProgress = true;
+        }
         upVidReq = stat_agent
             .post(simpleEndpoint)
             .set('Host', uploadEndpointUrl.split("/")[2])
             .set('Referer', uploadEndpointUrl)
-            .set('Content-Type', 'multipart/form-data; boundary=---------------------------18467633426500')
             .field('csrfmiddlewaretoken', csrfmwtoken)
             .field('upload_code', uploadcode)
             .field('upload_type', uploadType)
             .field('name', 'file')
             .field('filename', fname)
             .accept('application/json, text/javascript, */*; q=0.01')
-            .attach('file', `${localFilePath}`);
+            .attach('file', `${localFilePath}`)
+            .on('progress', function (e) {
+                event_generation.raiseHttpClientProgress(evType, getProgressPercent(e.loaded, e.total), null, null, uploadType);
+            });
         uploadVideoRequest = upVidReq;
         upVidReq.withCredentials().then((result) => {
+            if (uploadType == 'video') {
+                videoUploadInProgress = false;
+            } else if (uploadType == 'image') {
+                thumbnailUploadInProgress = false;
+            }
             staticVideoUploadResult = result;
             console.log(result);
             upVidReqResponseBody = upVidReq.response.body;
-        }).catch((err, res) => {
-            console.log(res);
+            if (result.status == 200) {
+                if (metapackage == undefined) {
+                    metapackage = {
+                        jsonMeta: {
+                            upload_title: localFilePath
+                        }
+                    }
+                }
+                event_generation.createNewUiEvent(`uploaded ${uploadType} for video :${metapackage.jsonMeta.upload_title}`);
+                event_generation.raiseAnyEvent(`uploadProgress`, null, null, true, null, null, null, uploadType);
+            }
+        }).catch((err) => {
+            if (uploadType == 'video') {
+                videoUploadInProgress = false;
+            } else if (uploadType == 'image') {
+                thumbnailUploadInProgress = false;
+            }
             console.log(err);
         });
     } else if (uploadType == 'meta') {
         var metastring = getJsonMetaData(
-            metapackage.csrfmiddlewaretoken,
-            metapackage.upload_title,
-            metapackage.upload_description,
-            metapackage.upload_code,
+            metapackage.jsonMeta.csrfmiddlewaretoken,
+            metapackage.jsonMeta.upload_title,
+            escape(metapackage.jsonMeta.upload_description),
+            metapackage.jsonMeta.upload_code,
             null,
             null,
-            10,
+            metapackage.jsonMeta.sensitivity,
             false,
             false,
-            true);
-        upVidReq = stat_agent
-            .post(getEndpointForStep(simpleEndpoint,uploadType))
-            .set('Host', uploadEndpointUrl.split("/")[2])
-            .set('Referer', uploadEndpointUrl)
-            .set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
-            .accept('*/*')
-            .send(metastring)
-            .withCredentials()
-            .buffer(true).then((res) => {
-                try {
-                    staticVideoUploadResult = res;
-                    console.log(res);
-                    console.log(res.text);
-                    console.log(res.status);
-                    console.log(res.headers);
-                } catch (err) { console.log(err.message); }
-                if (res.status == 200) {
-                    event_generation.createNewUiEvent(`uploaded metadata for video :${metapackage.upload_title}`);
-                    uploadVideoData(uploadEndpointUrl, null, null, null, 'meta_finalize', metapackage);
-                }
-            }).catch((err) => {
-                console.log(err);
-                console.log(err.message);
-                console.log(err.response);
-                event_generation.createNewUiEvent(`error ${err.message} sending metadeta`);
-            });
-
-    } else if (uploadType == 'meta_finalize') {
-        var metastring = getJsonMetaData(
-            metapackage.csrfmiddlewaretoken,
-            null,
-            null,
-            metapackage.upload_code,
-            metapackage.cid,
-            metapackage.cdid,
-            10, //@TODO add this
-            metapackage.publish_now,
-            true,
             true);
         upVidReq = stat_agent
             .post(getEndpointForStep(simpleEndpoint, uploadType))
@@ -393,24 +396,168 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
             .buffer(true).then((res) => {
                 try {
                     staticVideoUploadResult = res;
-                    console.log(res);
-                    console.log(res.text);
-                    console.log(res.status);
-                    console.log(res.headers);
+                    if (_vb_log) {
+                        console.log(res);
+                        console.log(res.text);
+                        console.log(res.status);
+                        console.log(res.headers);
+                    }
                 } catch (err) { console.log(err.message); }
-                try { console.log(res.response.body); }
-                catch { }
                 if (res.status == 200) {
-                    event_generation.createNewUiEvent(`uploaded metadata for video :${metapackage.upload_title}`);
+                    event_generation.createNewUiEvent(`uploaded metadata for video :${metapackage.jsonMeta.upload_title}`);
+                    uploadVideoData(uploadEndpointUrl, null, null, null, 'meta_finalize', metapackage);
+                }
+            }).catch((err) => {
+                console.log(err);
+                console.log(err.message);
+                console.log(err.response);
+                event_generation.createNewUiEvent(`error ${err.message} sending metadeta`);
+            });
+    } else if (uploadType == 'meta_finalize') {
+        var metastring = getJsonMetaData(
+            metapackage.jsonMeta.csrfmiddlewaretoken,
+            null,
+            null,
+            metapackage.jsonMeta.upload_code,
+            metapackage.jsonMeta.cid,
+            metapackage.jsonMeta.cdid,
+            metapackage.jsonMeta.sensitivity, 
+            metapackage.jsonMeta.publish_now,
+            true,
+            true);
+        var host = uploadEndpointUrl.split("/")[2];
+        upVidReq = stat_agent
+            .post(getEndpointForStep(simpleEndpoint, uploadType))
+            .set('Host', uploadEndpointUrl.split("/")[2])
+            .set('Referer', uploadEndpointUrl)
+            .set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+            .accept('*/*')
+            .send(metastring)
+            .withCredentials()
+            .buffer(true).then((res) => {
+                try {
+                    staticVideoUploadResult = res;
+                    if (_vb_log) {
+                        console.log(res);
+                        console.log(res.text);
+                        console.log(res.status);
+                        console.log(res.headers);
+                    }
+                } catch (err) { console.log(err.message); }
+                if (res.status == 200) {
+                    if (_vb_log) {
+                        console.log(res);
+                    }
+
+                    getVidReq = stat_agent
+                        .get('https://www.bitchute.com/video/' + uploadcode + '/')
+                        //.set('Connection', 'keep-alive')
+                        .withCredentials()
+                        .buffer(true).then((res) => {
+                            responseCookie = res.headers['set-cookie'];
+                            session_state.saveAllCookiesFromSetCookie(responseCookie);
+                            var newCsrfToken = stripEqualsFromResponse(res.request.cookies);
+                            event_generation.createNewUiEvent(`uploaded metadata for video :${metapackage.jsonMeta.upload_title}`);
+                            uploadVideoData(
+                                uploadEndpointUrl,
+                                null,
+                                newCsrfToken,
+                                null,
+                                'add_video_details',
+                                metapackage,
+                                generateCompletedUploadUrl(uploadcode));
+                        }).catch((err) => {
+                            console.log(err);
+                            console.log(getVidReq);
+                        });
+
+                    //event_generation.raiseAnyEvent('postingVideoFinalized', // @TODO remove
+                    //    'video posted successfully',
+                    //    {
+                    //        uploadTitle: metapackage.upload_title,
+                    //        uploadUrl: generateCompletedUploadUrl(uploadcode)
+                    //    },
+                    //    true);
+                } else {
+                    console.log('error occured getting video path');
+                    console.log(res);
+                }
+            }).catch((err) => {
+                console.log(err);
+                console.log(err.message);
+                console.log(err.response);
+                event_generation.createNewUiEvent(`error ${err.message} meta_finalizing video upload`);
+                event_generation.raiseAnyEvent('postingVideoFinalized', 'video failed to upload, check error logs');
+            });
+    } else if (uploadType == 'add_video_details') {
+        if (csrfmwtoken != undefined) {
+            metapackage.jsonMetaVideoDetails.csrfmiddlewaretoken = csrfmwtoken;
+        }
+        var metastring = getJsonMetaDataForVideoDetail(
+            metapackage.jsonMetaVideoDetails.csrfmiddlewaretoken,
+            escape(metapackage.jsonMetaVideoDetails.title),
+            escape(metapackage.jsonMetaVideoDetails.description),
+            metapackage.jsonMetaVideoDetails.hashtags,
+            metapackage.jsonMetaVideoDetails.category,
+            metapackage.jsonMetaVideoDetails.sensitivity,
+            metapackage.jsonMetaVideoDetails.is_discussable, 
+            true);
+        upVidReq = stat_agent
+            .post(`https://www.bitchute.com/video/${uploadcode}/save/`)
+            .set('Referer', `https://www.bitchute.com/video/${uploadcode}/`)
+            //.set('Host', 'www.bitchute.com')
+            //.set('Referer', remoteVideoPath)
+            //.set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+            //.set('Origin', 'https://www.bitchute.com')
+            //.accept('*/*')
+            .send(metastring)
+            .withCredentials()
+            .buffer(true).then((res) => {
+                try {
+                    staticVideoUploadResult = res;
+                    if (_vb_log) {
+                        console.log(res);
+                        console.log(res.text);
+                        console.log(res.status);
+                        console.log(res.headers);
+                    }
+                } catch (err) { console.log(err.message); }
+                if (res.status == 200) {
+                    event_generation.createNewUiEvent(`uploaded video details for video :${metapackage.jsonMetaVideoDetails.title}`);
+                    event_generation.raiseAnyEvent('postingVideoFinalized',
+                        'video posted successfully',
+                        {
+                            uploadTitle: metapackage.jsonMetaVideoDetails.title,
+                            uploadUrl: remoteVideoPath
+                        },
+                        true);
+                    resetUploadValues();
                 }
             }).catch((err) => {
                 console.log(err);
                 console.log(err.message);
                 console.log(err.response);
                 event_generation.createNewUiEvent(`error ${err.message} finalizing video upload`);
+                event_generation.raiseAnyEvent('postingVideoFinalized', 'video failed to upload, check error logs');
             });
-    } try { event_generation.createNewUiEvent(upVidReqResponseBody.toString());
-    } catch (err) {event_generation.createNewUiEvent(err.message); }
+    }
+}
+
+function generateCompletedUploadUrl(uploadId) {
+    if (uploadId == undefined) { return; }
+    return (strDomainVidPath + uploadId);
+}
+
+function getProgressPercent(bytesSent, byteTotal) {
+    if(vblog()){console.log(`bytes sent:${bytesSent} of bytes total:${byteTotal}`)}
+    return ((bytesSent/byteTotal)*100);
+}
+
+function resetUploadValues() {
+    videoUploadInProgress = false;
+    thumbnailUploadInProgress = false;
+    metaUploadInProgress = false;
+    latestVideoUploadCode = undefined;
 }
 
 function getEndpointForStep(endpointRoot, step) {
@@ -422,6 +569,8 @@ function getEndpointForStep(endpointRoot, step) {
         return endpointRoot + '/upload/';
     } else if (step == 'image') {
         return endpointRoot + '/upload/';
+    } else if (step == 'add_video_details') {
+        return endpointRoot + '/save/';
     }
 }
 
@@ -433,54 +582,74 @@ function getJsonMetaData(csrfmiddlewaretoken, uploadTitle, uploadDescription, up
     cdid = stripEqualsFromResponse(cdid);
     sensitivity = stripEqualsFromResponse(sensitivity.toString());
     publishNow = stripEqualsFromResponse(publishNow);
-    if (finalize) {
-        if (stringify) {
+    if (stringify) {
+        if (finalize) {
             var stringified = `csrfmiddlewaretoken=${csrfmiddlewaretoken}&`;
             stringified += `upload_code=${uploadCode}&`;
             stringified += `cid=${cid}&`;
             stringified += `cdid=${cdid}&`;
             stringified += `sensitivity=${sensitivity}&`;
             stringified += `publish_now=${publishNow}`;
-            return stringified;
         } else {
-            var metaDataJson = {
-                csrfmiddlewaretoken: csrfmiddlewaretoken,
-                upload_code: uploadCode,
-                cid: cid,
-                cdid: cdid,
-                sensitivity: sensitivity,
-                publish_now: publishNow
-            }
-        }
-    } else {
-        if (stringify) {
             var stringified = `csrfmiddlewaretoken=${csrfmiddlewaretoken}&`;
             stringified += `upload_title=${uploadTitle}&`;
             stringified += `upload_description=${uploadDescription}&`;
             stringified += `upload_code=${uploadCode}`;
-            return stringified;
-        } else {
-            var metaDataJson = {
-                csrfmiddlewaretoken: csrfmiddlewaretoken,
-                upload_title: uploadTitle,
-                upload_description: uploadDescription,
-                upload_code: uploadCode
-            }
+        }
+        return stringified;
+    } else {
+        var metaDataJson = {
+            csrfmiddlewaretoken: csrfmiddlewaretoken,
+            upload_code: uploadCode,
+            cid: cid,
+            cdid: cdid,
+            sensitivity: sensitivity,
+            publish_now: publishNow,
+            upload_title: uploadTitle,
+            upload_description: uploadDescription
+        };
+        return metaDataJson
+    }
+}
+
+function getJsonMetaDataForVideoDetail(csrfmiddlewaretoken, title, description, hashtags, category, sensitivity, is_discussable, stringify) {
+    csrfmiddlewaretoken = stripEqualsFromResponse(csrfmiddlewaretoken);
+    if (stringify) {
+        var stringified = `csrfmiddlewaretoken=${csrfmiddlewaretoken}&`;
+        stringified += `title=${title}&`;
+        stringified += `description=${description}&`;
+        stringified += `hashtags=${hashtags}&`;
+        stringified += `category=${category}&`;
+        stringified += `sensitivity=${sensitivity}&`;
+        stringified += `is_discussable=${is_discussable}`;
+        return stringified;
+    } else {
+        var metaDataJson = {
+            csrfmiddlewaretoken: csrfmiddlewaretoken,
+            title: title,
+            description: description,
+            hashtags: hashtags,
+            category: category,
+            sensitivity: sensitivity,
+            is_discussable: is_discussable
         }
     }
-    return metaDataJson;
+    return metaDataJson
 }
+
 
 function stripEqualsFromResponse(stringParam) {
     try {
-        if (stringParam.match('=')) {
-            return stringParam.split('=')[1];
-        }
-        else {
-            return stringParam;
+        if (typeof (stringParam) === 'string') {
+            if (stringParam.match('=')) {
+                return stringParam.split('=')[1];
+            }
+            else {
+                return stringParam;
+            }
         }
     } catch { }
-    return '';
+    return stringParam;
 }
 
 function getJsonMetaDataString(csrfmiddlewaretoken, uploadTitle, uploadDescription, uploadCode) {

@@ -17,6 +17,7 @@ localChoose = '';
 localUpload = '';
 localVidChooserLabel = '';
 localNoFileSelected = '';
+localNoUploadSource = '';
 localFiles = '';
 localVideoFinishedProcessing = '';
 localProcessingVideo = '';
@@ -27,7 +28,9 @@ localVideoFramesProcessed = '';
 localVideoPercentageComplete = '';
 localUnsafeRequestDetected = '';
 local_login_success = '';
-
+localUnableToGetPostingPath = '';
+localUnableToPostNoVideoData = '';
+localUnableToPostNoThumbnail = '';
 //begin English =-=-
 
 function setLocalStringsToEng() {
@@ -35,6 +38,7 @@ function setLocalStringsToEng() {
     localUpload = 'Upload ';
     localVidChooserLabel = 'Select the File to be uploaded ';
     localNoFileSelected = 'No file selected.. choose one first ';
+    localNoUploadSource = 'there is no file to upload; select one first';
     localFiles = 'Files ';
     localVideoFinishedProcessing = 'video finished processing ';
     localProcessingVideo = 'processing video ';
@@ -44,7 +48,11 @@ function setLocalStringsToEng() {
     localVideoFramesProcessed = 'frames processed';
     localVideoPercentageComplete = ' percent completed';
     localUnsafeRequestDetected = 'unsafe POST path detected, you are posting your auth token to a non-bitchute endpoint.';
-    local_login_success = 'successfully logged in as user '
+    local_login_success = 'successfully logged in as user ';
+    localUnableToGetPostingPath = 'unable to get posting path; are you logged in?';
+    localUnableToPostNoVideoData = 'unable to post video because video data not uploaded; upload the video first';
+    localUnableToPostNoThumbnail = 'unable to post video because thumbnail has no been uploaded' + '\n' +
+        'post the thumbnail first and try again';
 }
 
 //end English =-=-
