@@ -1,3 +1,10 @@
+To Test the install on windows:
+
+download dist/win-unpacked/ directory or the entire repo then unzip dist/win-unpacked/bitchute-upload-encoder.zip to the dist/win-unpacked/ directory.
+This file is compressed because I cannot commit the uncompressed file.  Then you should be able to run bitchute-upload-encoder.exe from this directory
+
+any problems send me a dm on twitter @vybeypantelonez or get @ me on bitchute.com/channel/hexagod and I'll get you setup
+
 Implementation: for BitChute.com video pre-processing and possibly more
 
 app.by( @bitchute = { Ray Vahey, Rich Jones }
