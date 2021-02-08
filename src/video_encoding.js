@@ -1,8 +1,13 @@
 diag = require('./diagnostic.js')
 const path = require('path')
 
-const ffmpeg = require('fluent-ffmpeg')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+ffmpeg = require('fluent-ffmpeg');
+ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+
+ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked'); // for debug 'npm start' remove .replace
+                                                                  // this is only tested on windows 
+                                                                  // without replace app is throwing a missing ffmpeg.exe error
+
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 var event_generation = require('../vm/event_generators.js');

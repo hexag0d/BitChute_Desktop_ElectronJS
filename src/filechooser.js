@@ -7,6 +7,7 @@ const ipc = require('electron').ipcRenderer
 const dialog = electron.remote.dialog
 const path = require('path')
 const video_encoder = require('./video_encoding.js')
+const event_gen = require('../vm/event_generators.js')
 
 var diag = require('./diagnostic.js')
 
@@ -17,7 +18,7 @@ module.exports = {
 generalStaticFilePath = '';
 temFile = undefined;
 
-function showXPlatformChooser(types, label, sendTo) {
+async function showXPlatformChooser(types, label, sendTo) {
     if (!types) { types = '*.*' }
     if (!label) { label = 'use' }
     if (process.platform !== 'darwin') { // If the platform is 'win32' or 'Linux'
@@ -41,8 +42,9 @@ function showXPlatformChooser(types, label, sendTo) {
                 else if (sendTo == 'videoUploadSource') { //sendto video upload source
                     onVideoSourceChosen(file.filePaths[0]);
                     return;
-                }
-                else if (sendTo) { // send to any place
+                } else if (sendTo == 'ffmpegSource') {
+                    event_gen.raiseAnyEvent('ffmpeg_source_selected', null, file.filePaths[0]);
+                } else if (sendTo) { // send to any place
                     try { sendTo = file.filePaths[0]; }
                     catch (err) { diag.writeToDebug(err.message) }
                     return;

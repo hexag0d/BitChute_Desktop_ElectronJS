@@ -24,7 +24,7 @@
 const event_generation = require('../vm/event_generators.js');
 const upload_method = require('../src/upload.js');
 const settings = require('../settings.js');
-const session_state = require('../src/session_state.js');
+session_state = require('../src/session_state.js');
 const vid_encoding = require('../src/video_encoding.js');
 const chooser = require('../src/filechooser.js');
 
@@ -40,6 +40,47 @@ userRequestedVideoPostBeforeUpload = false;
 writeToLogin = function writeToLoginDiag(msg) {
     loginDiagnosticTextBox.value = msg.toString();
 }
+
+// these aren't working ATM so disabled until I get a chance to fix them
+
+//fillMpegSrc = async function fillFfmpegSource() {
+//    var mpegSrc = await session_state.getAnyCookieValueFromSession('ffmpeg_path');
+//} 
+
+//fillMpegSrc();
+
+ffmpegSourceChanged = function () {
+    ffmpegPath_check = document.getElementById('FFMpegSourceTextBox');
+    //session_state.buildCookie(true, null, null, null, { // @TODO cookie needs to be fixed, not sure why not working
+    //    name: 'ffmpeg_path',
+    //    value: ffmpegPath_check
+    //})
+}
+
+document.getElementById('FFMpegSourceTextBox').value = ffmpegPath;
+
+document.getElementById('FFMpegSourceTextBox').onchange += ffmpegSourceChanged;
+
+async function getFFMpegSourceFromChooser() {
+    var fmpgsrc = await chooser.showXPlatformChooser(null, null, 'ffmpegSource');
+    if (fmpgsrc != undefined) {
+        if (fmpgsrc.type == 'string') {
+            document.getElementById('FFMpegSourceTextBox').value = fmpgsrc;
+        }
+    }
+}
+
+document.getElementById('FFMpegSourceButton').addEventListener('click', () => {
+    getFFMpegSourceFromChooser();
+})
+
+document.addEventListener('ffmpeg_source_selected', (event) => {
+    document.getElementById('FFMpegSourceTextBox').value = event.detail.data;
+    session_state.buildCookie(true, null, null, null, {
+        name: 'ffmpeg_path',
+        value: event.detail.data
+    })
+})
 
 chooseVideoFileButton.addEventListener('click', () => {
     if (videoProcessingInProgress) {

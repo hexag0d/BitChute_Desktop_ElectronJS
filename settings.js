@@ -3,7 +3,7 @@
  * but may eventually prove useful @hexagod
  */
 
-debugLocalApp = true;
+debugLocalApp = false;
 //bitchute.com settings
 
 
