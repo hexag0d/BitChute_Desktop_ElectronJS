@@ -7,6 +7,7 @@ const ipc = require('electron').ipcRenderer
 const dialog = electron.remote.dialog
 const path = require('path')
 const video_encoder = require('./video_encoding.js')
+const event_gen = require('../vm/event_generators.js')
 
 var diag = require('./diagnostic.js')
 
@@ -17,7 +18,7 @@ module.exports = {
 generalStaticFilePath = '';
 temFile = undefined;
 
-function showXPlatformChooser(types, label, sendTo) {
+async function showXPlatformChooser(types, label, sendTo, getFileLengthOnly) {
     if (!types) { types = '*.*' }
     if (!label) { label = 'use' }
     if (process.platform !== 'darwin') { // If the platform is 'win32' or 'Linux'
@@ -35,14 +36,15 @@ function showXPlatformChooser(types, label, sendTo) {
                     return;
                 }
                 else if (sendTo == 'videoProcessorSource') {
-                    onVideoSourceChosen(file.filePaths[0], true);
+                    onVideoSourceChosen(file.filePaths[0], false, getFileLengthOnly);
                     return;
                 }
                 else if (sendTo == 'videoUploadSource') { //sendto video upload source
                     onVideoSourceChosen(file.filePaths[0]);
                     return;
-                }
-                else if (sendTo) { // send to any place
+                } else if (sendTo == 'ffmpegSource') {
+                    event_gen.raiseAnyEvent('ffmpeg_source_selected', null, file.filePaths[0]);
+                } else if (sendTo) { // send to any place
                     try { sendTo = file.filePaths[0]; }
                     catch (err) { diag.writeToDebug(err.message) }
                     return;
@@ -95,13 +97,18 @@ function showXPlatformChooser(types, label, sendTo) {
     }
 }
 
-function onVideoSourceChosen(vid_path, encodeFile) {
+function onVideoSourceChosen(vid_path, encodeFile, calculateVideoLength) {
     diag.writeToDebug(global.localVideoSourceSelected + '\n' + vid_path);
-    if (encodeFile) {
-        videoProcessorSourceTextBox.value = vid_path;
-        video_encoder.encodeFile(vid_path);
+    videoProcessorSourceTextBox.value = vid_path;
+    var encoderAudioBitrateInBitsPerSecond = videoEncoderSettingAudioBitrate.replace('k', '') * 1000;
+    if (calculateVideoLength) {
+        video_encoder.getVideoFileLength(vid_path, true, desiredFileSizeInMB, encoderAudioBitrateInBitsPerSecond, desiredMaxVideoBitRate);
     } else {
-        processedVideoTextBox.value = vid_path;
+        if (encodeFile == true) {
+            video_encoder.encodeFile(vid_path);
+        } else {
+            processedVideoTextBox.value = vid_path;
+        }
     }
 }
 

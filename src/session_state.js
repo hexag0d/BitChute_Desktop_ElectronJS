@@ -9,7 +9,19 @@ module.exports = {
     buildCookie,
     getCookiesFromSession,
     saveAllCookiesFromSetCookie,
-    clearCookies
+    clearCookies,
+    getAnyCookieValueFromSession
+}
+
+ffmpeg_path = undefined;
+
+async function getAnyCookieValueFromSession(cookieName) {
+    var _cookies = await session.defaultSession.cookies.get({ domain: 'www.bitchute.com' });
+    for (i = 0; i < _cookies.length; i++) {
+        if (_cookies[i].name == cookieName) {
+            return _cookies[i].value;
+        }
+    }
 }
 
 /**
@@ -93,7 +105,7 @@ function superAgentCookieCast(jsonObject) {
 
 }
 
-function buildCookie(setCookieAfterBuild, csrftoken, cfduid, sessionid) {
+function buildCookie(setCookieAfterBuild, csrftoken, cfduid, sessionid, anyCookie) {
     var newCookie = undefined;
     var cookieJson = undefined;
     if (csrftoken != null) {
@@ -125,6 +137,12 @@ function buildCookie(setCookieAfterBuild, csrftoken, cfduid, sessionid) {
             sameSite: 'lax',
             httpOnly: true,
             expirationDate: getCookieValue(sessionid, 'expires')
+        }
+    } else if (anyCookie != null) {
+        cookieJson = {
+            url: 'https://www.bitchute.com',
+            name: anyCookie.name,
+            value: anyCookie.value
         }
     }
     if (setCookieAfterBuild) {

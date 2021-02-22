@@ -2,3 +2,9 @@ node_modules
 package-lock.json
 /.vs
 /index_2.html
+/dist/win-unpacked
+/dist/builder-effective-config.yaml
+/dist/BitChute Setup 0.16.1.exe.blockmap
+/dist/BitChute Setup 0.16.1.exe
+/dist
+/yarn.lock
