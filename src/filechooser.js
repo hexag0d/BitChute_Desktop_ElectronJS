@@ -36,7 +36,7 @@ async function showXPlatformChooser(types, label, sendTo, getFileLengthOnly) {
                     return;
                 }
                 else if (sendTo == 'videoProcessorSource') {
-                    onVideoSourceChosen(file.filePaths[0], false, getFileLengthOnly);
+                    onVideoSourceChosen(file.filePaths[0], !getFileLengthOnly, getFileLengthOnly);
                     return;
                 }
                 else if (sendTo == 'videoUploadSource') { //sendto video upload source
