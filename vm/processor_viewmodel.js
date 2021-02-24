@@ -60,22 +60,22 @@ ffmpegSourceChanged = function () {
 desiredMaxVideoBitRate = document.getElementById('DesiredVideoBitRateMaxTextBox').value;
 
 document.getElementById('DesiredVideoBitRateMaxTextBox').addEventListener('change', () => {
-    if (document.getElementById('DesiredVideoBitRateMaxTextBox').value <= 0) {
-        alert('desired bitrate must be greater than 0kbps');
-        document.getElementById('DesiredVideoBitRateMaxTextBox').value = 0;
-        desiredFileSizeInMB = 0;
-    }
+    //if (document.getElementById('DesiredVideoBitRateMaxTextBox').value <= 0) { // glitched out, disabling because this is annoying and not working
+    //    alert('desired bitrate must be greater than 0kbps');
+    //    document.getElementById('DesiredVideoBitRateMaxTextBox').value = 0;
+    //    desiredFileSizeInMB = 0;
+    //}
     desiredMaxVideoBitRate = document.getElementById('DesiredVideoBitRateMaxTextBox').value;
 })
 
 desiredFileSizeInMB = document.getElementById('DesiredFileSizeTextBox').value;
 
 document.getElementById('DesiredFileSizeTextBox').addEventListener('change', () => {
-    if (document.getElementById('DesiredFileSizeTextBox').value <= 0) {
-        alert('file size must be greater than 0MB');
-        document.getElementById('DesiredFileSizeTextBox').value = 0;
-        desiredFileSizeInMB = 0;
-    }
+    //if (document.getElementById('DesiredFileSizeTextBox').value <= 0) { // glitched out, disabling because this is annoying and not working
+    //    alert('file size must be greater than 0MB');
+    //    document.getElementById('DesiredFileSizeTextBox').value = 0;
+    //    desiredFileSizeInMB = 0;
+    //}
     desiredFileSizeInMB = document.getElementById('DesiredFileSizeTextBox').value;
 })
 
