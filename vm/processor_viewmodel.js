@@ -24,7 +24,7 @@
 const event_generation = require('../vm/event_generators.js');
 const upload_method = require('../src/upload.js');
 const settings = require('../settings.js');
-const session_state = require('../src/session_state.js');
+session_state = require('../src/session_state.js');
 const vid_encoding = require('../src/video_encoding.js');
 const chooser = require('../src/filechooser.js');
 
@@ -41,6 +41,74 @@ writeToLogin = function writeToLoginDiag(msg) {
     loginDiagnosticTextBox.value = msg.toString();
 }
 
+// these aren't working ATM so disabled until I get a chance to fix them
+
+//fillMpegSrc = async function fillFfmpegSource() {
+//    var mpegSrc = await session_state.getAnyCookieValueFromSession('ffmpeg_path');
+//} 
+
+//fillMpegSrc();
+
+ffmpegSourceChanged = function () {
+    ffmpegPath_check = document.getElementById('FFMpegSourceTextBox');
+    //session_state.buildCookie(true, null, null, null, { // @TODO cookie needs to be fixed, not sure why not working
+    //    name: 'ffmpeg_path',
+    //    value: ffmpegPath_check
+    //})
+}
+
+desiredMaxVideoBitRate = document.getElementById('DesiredVideoBitRateMaxTextBox').value;
+
+document.getElementById('DesiredVideoBitRateMaxTextBox').addEventListener('change', () => {
+    //if (document.getElementById('DesiredVideoBitRateMaxTextBox').value <= 0) { // glitched out, disabling because this is annoying and not working
+    //    alert('desired bitrate must be greater than 0kbps');
+    //    document.getElementById('DesiredVideoBitRateMaxTextBox').value = 0;
+    //    desiredFileSizeInMB = 0;
+    //}
+    desiredMaxVideoBitRate = document.getElementById('DesiredVideoBitRateMaxTextBox').value;
+})
+
+desiredFileSizeInMB = document.getElementById('DesiredFileSizeTextBox').value;
+
+document.getElementById('DesiredFileSizeTextBox').addEventListener('change', () => {
+    //if (document.getElementById('DesiredFileSizeTextBox').value <= 0) { // glitched out, disabling because this is annoying and not working
+    //    alert('file size must be greater than 0MB');
+    //    document.getElementById('DesiredFileSizeTextBox').value = 0;
+    //    desiredFileSizeInMB = 0;
+    //}
+    desiredFileSizeInMB = document.getElementById('DesiredFileSizeTextBox').value;
+})
+
+document.addEventListener('onBitRateCalculationFinished', (event) => {
+    videoEncoderSettingVideoBitrate = event.detail.data.videoBitRate.toString() + 'k';
+    document.getElementById('ProcessToVideoBitRateTextBox').value = event.detail.data.videoBitRate;
+})
+
+document.getElementById('FFMpegSourceTextBox').value = ffmpegPath;
+
+document.getElementById('FFMpegSourceTextBox').onchange += ffmpegSourceChanged;
+
+async function getFFMpegSourceFromChooser() {
+    var fmpgsrc = await chooser.showXPlatformChooser(null, null, 'ffmpegSource');
+    if (fmpgsrc != undefined) {
+        if (fmpgsrc.type == 'string') {
+            document.getElementById('FFMpegSourceTextBox').value = fmpgsrc;
+        }
+    }
+}
+
+document.getElementById('FFMpegSourceButton').addEventListener('click', () => {
+    getFFMpegSourceFromChooser();
+})
+
+document.addEventListener('ffmpeg_source_selected', (event) => {
+    document.getElementById('FFMpegSourceTextBox').value = event.detail.data;
+    session_state.buildCookie(true, null, null, null, {
+        name: 'ffmpeg_path',
+        value: event.detail.data
+    })
+})
+
 chooseVideoFileButton.addEventListener('click', () => {
     if (videoProcessingInProgress) {
         if (confirm('video processing is already in progress; would you like to cancel and process a new video?')) {
@@ -50,7 +118,7 @@ chooseVideoFileButton.addEventListener('click', () => {
             return;
         }
     }
-    chooser.showXPlatformChooser(null, null, 'videoProcessorSource');
+    chooser.showXPlatformChooser(null, null, 'videoProcessorSource', document.getElementById('CalculateBitRateCheckBox').checked);
 })
 
 selectPreProcessedFileButton.addEventListener('click', () => {
@@ -290,6 +358,7 @@ document.getElementById('ProcessToVideoBitRateTextBox').addEventListener('change
 
 document.getElementById('ProcessToAudioBitRateSelectBox').addEventListener('change', () => {
     videoEncoderSettingAudioBitrate = document.getElementById('ProcessToAudioBitRateSelectBox').value + 'k';
+    
 })
 
 document.getElementById('ProcessToVideoFpsSelectBox').addEventListener('change', () => {

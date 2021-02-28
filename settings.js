@@ -3,14 +3,15 @@
  * but may eventually prove useful @hexagod
  */
 
-debugLocalApp = true;
+debugLocalApp = false;
 //bitchute.com settings
 
 
 module.exports = {
     _vblg,
     getAppLanguageSetting,
-    debugLocalApp
+    debugLocalApp,
+    setAudioBitRate
 }
 
 userDonationSupportLevel = 'none';
@@ -30,7 +31,14 @@ videoEncoderSettingVideoFilters = [
     }
 ];
 
-videoEncoderSettingAudioBitrate = '96k';
+videoEncoderSettingAudioBitrate = '96k'; // @TODO eventually need to just get rid of the k value and use only int
+
+function setAudioBitRate(videoEncoderSettingAudioBitrateNew) {
+    videoEncoderSettingAudioBitrate = videoEncoderSettingAudioBitrateNew;
+}
+
+setAudioBitRate(videoEncoderSettingAudioBitrate);
+
 videoEncoderSettingVideoBitrate = '288k';
 videoEncoderSettingVideoFPS = '30';
 

@@ -558,6 +558,7 @@ function resetUploadValues() {
     thumbnailUploadInProgress = false;
     metaUploadInProgress = false;
     latestVideoUploadCode = undefined;
+    upVidReq = undefined;
 }
 
 function getEndpointForStep(endpointRoot, step) {

@@ -1,15 +1,24 @@
 diag = require('./diagnostic.js')
 const path = require('path')
 
-const ffmpeg = require('fluent-ffmpeg')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+ffmpeg = require('fluent-ffmpeg');
+ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+
+ //FOR RELEASE ONLY UNCOMMENT:
+
+ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked'); // for debug 'npm start' remove .replace
+                                                                  // this is only tested on windows 
+                                                                  // without replace app is throwing a missing ffmpeg.exe error
+
+
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 var event_generation = require('../vm/event_generators.js');
 
 module.exports = {
     encodeFile,
-    cancelVideoProcessing
+    cancelVideoProcessing,
+    getVideoFileLength
 }
 
 if (debugLocalApp) {
@@ -36,10 +45,87 @@ if (debugLocalApp) {
 
 }
 
+vidLength = undefined;
+
+function calculateMaximumBitRatesForFileSize(fileLength, desiredMaxSizeInMegaBytes, desiredAudioBitRate, desiredMaxVideoBitRate) {
+    var newVideoKBitRate = 0;
+    var totalAudioKBits = fileLength * (desiredAudioBitRate / 1000);
+    var totalVideoKBits = 0;
+    var desiredMaxSizeInKBits = desiredMaxSizeInMegaBytes * 1000/*KB*/ * 8/*Kb*/;
+    if (desiredMaxVideoBitRate != null) {
+        totalVideoKBits = ((fileLength * desiredMaxVideoBitRate) * 8) + (desiredAudioBitRate / 1000);
+        if (totalVideoKBits <= desiredMaxSizeInKBits) {
+            newVideoKBitRate = desiredMaxVideoBitRate;
+        } else {
+            var kBitsAvailableForVideo = desiredMaxSizeInKBits - totalAudioKBits;
+            newVideoKBitRate = Math.round(kBitsAvailableForVideo / fileLength);
+        }
+        if (newVideoKBitRate > desiredMaxVideoBitRate) {
+            newVideoKBitRate = desiredMaxVideoBitRate;
+        }
+        event_generation.raiseAnyEvent('onBitRateCalculationFinished', null, {
+            videoBitRate: newVideoKBitRate,
+            audioBitRate: desiredAudioBitRate
+        })
+        return {
+            videoBitRate: newVideoKBitRate,
+            audioBitRate: desiredAudioBitRate
+        }
+    } else {
+        totalVideoKBits = ((desiredMaxSizeInMegaBytes * 8) * 1000 * fileLength) - (desiredAudioBitRate * fileLength);
+        var newVideoKBitRate = totalVideoKBits / fileLength;
+        newVideoKBitRate = Math.round(newVideoKBitRate);
+        diag.writeToDebug(`calc video bitrate = ${newVideoKBitRate}k`);
+        diag.writeToDebug(`for desired audio bitrate ${desiredAudioBitRate}`);
+        event_generation.raiseAnyEvent('onBitRateCalculationFinished', null, {
+            videoBitRate: newVideoKBitRate,
+            audioBitRate: desiredAudioBitRate
+        })
+        return {
+            videoBitRate: newVideoKBitRate,
+            audioBitRate: desiredAudioBitRate
+        }
+    }
+}
+
+function getVideoFileLength(file_path, calculateBitRates, desiredFileSizeInMB, audioBitRate, desiredMaxVideoBitRate) {
+    try {
+        var { ext, name, dir } = path.parse(file_path)
+        var rndId = Math.floor((Math.random() * 99998) + 1);
+        if (name.length > 5) { // trim long filenames otherwise the upload will 404 after POST
+            name = name.substring(0, 5);
+        }
+        var tempFile = `${dir}/${name}_${rndId}${videoEncoderOutputExtension}`;
+        proc = undefined;
+        proc = ffmpeg(file_path)
+            .on('codecData', function (data) {
+                vidLength = convertTimeStampToSeconds(data.duration); // get the total video length
+                calculateMaximumBitRatesForFileSize(vidLength, desiredFileSizeInMB, audioBitRate, desiredMaxVideoBitRate);
+                cancelVideoProcessing(true);
+                encodeFile(file_path);
+            })
+            .on('end', function () {
+            })
+            .on('error', function (err) {
+                
+            })
+            .on('progress', function ({ timemark }) {
+
+            })
+            .audioBitrate('64k')
+            .videoBitrate('288k', [true, true]) 
+            .save('_probe.tmp')
+    } catch (error) {
+
+    }
+}
+
+fpath = undefined;
+
 proc = undefined;
 
 function encodeFile(file_path) {
-	try {
+    try {
 		var { ext, name, dir } = path.parse(file_path)
         var rndId = Math.floor((Math.random() * 99998) + 1);
         if (name.length > 5) { // trim long filenames otherwise the upload will 404 after POST
@@ -78,10 +164,12 @@ function encodeFile(file_path) {
     }
 }
 
-function cancelVideoProcessing() {
+function cancelVideoProcessing(doNotNotify) {
     proc.ffmpegProc.kill();
     proc = undefined;
-    diag.writeToDebug('video processing cancelled at user request');
+    if (!doNotNotify) {
+        diag.writeToDebug('video processing cancelled at user request');
+    }
 }
 
 videoProcessedAndAwaitingUpload = undefined;
