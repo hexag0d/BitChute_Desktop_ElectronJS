@@ -4,8 +4,7 @@ const path = require('path')
 ffmpeg = require('fluent-ffmpeg');
 ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 
- //FOR RELEASE ONLY UNCOMMENT:
-
+// FOR RELEASE ONLY UNCOMMENT:
 ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked'); // for debug 'npm start' remove .replace
                                                                   // this is only tested on windows 
                                                                   // without replace app is throwing a missing ffmpeg.exe error
@@ -99,6 +98,9 @@ function getVideoFileLength(file_path, calculateBitRates, desiredFileSizeInMB, a
         proc = undefined;
         proc = ffmpeg(file_path)
             .on('codecData', function (data) {
+                if (debugLocalApp) {
+                    console.log(data);
+                }
                 vidLength = convertTimeStampToSeconds(data.duration); // get the total video length
                 calculateMaximumBitRatesForFileSize(vidLength, desiredFileSizeInMB, audioBitRate, desiredMaxVideoBitRate);
                 cancelVideoProcessing(true);
@@ -107,16 +109,16 @@ function getVideoFileLength(file_path, calculateBitRates, desiredFileSizeInMB, a
             .on('end', function () {
             })
             .on('error', function (err) {
-                
+
             })
             .on('progress', function ({ timemark }) {
 
             })
-            .audioBitrate('64k')
-            .videoBitrate('288k', [true, true]) 
-            .save('_probe.tmp')
+            .audioBitrate(videoEncoderSettingAudioBitrate)
+            .videoBitrate(videoEncoderSettingAudioBitrate, [true, true])
+            .save('_tempProbe.mp4')
     } catch (error) {
-
+        //diag.writeToDebug(error);
     }
 }
 
@@ -126,7 +128,7 @@ proc = undefined;
 
 function encodeFile(file_path) {
     try {
-		var { ext, name, dir } = path.parse(file_path)
+        var { ext, name, dir } = path.parse(file_path)
         var rndId = Math.floor((Math.random() * 99998) + 1);
         if (name.length > 5) { // trim long filenames otherwise the upload will 404 after POST
             name = name.substring(0, 5);
@@ -193,7 +195,7 @@ function onVideoEncodingProgress(timemark, vlength, started, path, error) {
         } else {
             event_generation.raiseNewVideoProcessingEvent(null, null, null, error);
         }
-    } 
+    }
 }
 
 function convertTimeStampToSeconds(t) {

@@ -5,6 +5,4 @@ package-lock.json
 /dist/win-unpacked
 /dist/builder-effective-config.yaml
 /dist/BitChute Setup 0.16.1.exe.blockmap
-/dist/BitChute Setup 0.16.1.exe
-/dist
 /yarn.lock

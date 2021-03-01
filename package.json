@@ -1,6 +1,6 @@
 {
   "name": "BitChute",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Video pre-encoder and uploader for BitChute.com",
   "main": "main.js",
   "scripts": {
