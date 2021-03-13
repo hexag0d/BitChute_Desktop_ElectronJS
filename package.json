@@ -1,24 +1,29 @@
 {
   "name": "BitChute",
-  "version": "0.0.1",
+  "version": "0.18.1",
   "description": "Video pre-encoder and uploader for BitChute.com",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "repository": "https://gitlab.com/BitChute/bitchuteuploader",
   "keywords": [
     "electron",
     "ffmpeg"
   ],
-  "author": "BitChute Ltd, hexagod, Nilkinom",
-  "license": "CC0-1.0",
+  "author": "BitChute Ltd, hexagod, Nilk",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^9.1.1",
+    "electron-builder": "^22.9.1",
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
+    "dist": "^0.1.2",
+    "electron-context-menu": "^2.5.0",
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^3.0.0",
     "jquery": "^3.5.1",

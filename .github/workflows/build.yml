@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node_version: [14]
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node_version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node_version }}
+        
+    - name: Cache
+      uses: actions/cache@v2.1.4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}_node_modules
+        
+    - name: npm install and build
+      run: |
+        npm install
+        npm run dist --if-present
+        
+    - uses: actions/upload-artifact@v2
+      if: |
+        startsWith(runner.os, 'linux')
+      with:
+        name: bitchuteuploader-linux
+        path: ./dist/*.AppImage
+        
+    - uses: actions/upload-artifact@v2
+      if: |
+        startsWith(runner.os, 'windows')
+      with:
+        name: bitchuteuploader-windows
+        path: ./dist/*.exe
+        
+    - uses: actions/upload-artifact@v2
+      if: |
+        startsWith(runner.os, 'mac')
+      with:
+        name: bitchuteuploader-macos
+        path: ./dist/*.dmg
