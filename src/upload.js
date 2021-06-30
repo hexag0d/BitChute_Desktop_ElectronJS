@@ -37,7 +37,7 @@
 //const axios = require('axios').default; //@TODO remove axios
 
 const electron = require('electron');
-const net = electron.remote.net; 
+const net = electron.remote.net;
 
 const session_state = require('./session_state.js');
 
@@ -96,7 +96,13 @@ async function getInitialResponseWithNet(shouldAwaitResponse) {
     event_generation.createNewUiEvent('getting initial web response');
     var cookies = await session_state.getCookiesFromSession(true, stat_agent, true);
     initialDoc = undefined;
-    request = stat_agent.get('https://www.bitchute.com/').buffer(true).withCredentials();
+    request = stat_agent.get('https://www.bitchute.com/')
+        .set('Host', 'www.bitchute.com')
+        //.set('X-Requested-With', 'XMLHttpRequest')
+        .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
+        .set('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0')
+        .buffer(true)
+        .withCredentials()
     console.log(request);
     if (shouldAwaitResponse) {
         staticResponse = await request;
@@ -114,13 +120,13 @@ async function getInitialResponseWithNet(shouldAwaitResponse) {
                     for (i = 0; i < initialDoc.getElementsByClassName('dropdown-item spa').length; i++) {
                         if (initialDoc.getElementsByClassName('dropdown-item spa')[i].innerText == 'Profile') {
                             var p = i + 1;
-                            event_generation.raiseAnyEvent('loginEvent',initialDoc.getElementsByClassName('dropdown-item spa')[p].innerText);
+                            event_generation.raiseAnyEvent('loginEvent', initialDoc.getElementsByClassName('dropdown-item spa')[p].innerText);
                             console.log(p);
                             return;
                         }
                     }
                 }
-                catch(err){
+                catch (err) {
                     console.log(err.message);
                 }
             }
@@ -150,29 +156,34 @@ async function makeLoginRequest(username, password, csrfmiddlewaretoken, onetime
     request = undefined;
     request = stat_agent.post('https://www.bitchute.com/accounts/login/')
         .set('Referer', 'https://www.bitchute.com/')
-        .set('X-Requested-With', 'XMLHttpRequest').set('Accept', '*/*')
+        .set('Accept-Encoding', 'gzip, deflate, br')
+        .set('Origin', 'https://www.bitchute.com')
+        .set('Host', 'www.bitchute.com')
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .set('Accept', '*/*')
         .set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+        .set('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0')
         .withCredentials()
         .send(getLoginFormDataString(username, password, csrfmiddlewaretoken, onetimecode))
         .buffer(true)
     console.log(request);
-        request.then((res) => {
-            console.log(res.text);
-            console.log(res.status);
-            console.log(res.headers);
-            staticResponse = res;
-            responseCookie = res.headers['set-cookie'];
-            session_state.saveAllCookiesFromSetCookie(responseCookie);
-            if (res.text.match('"errors": "None"')) {
-                event_generation.createNewUiEvent(`logged in as ${username}`);
-                event_generation.raiseAnyEvent(`loginEvent`, `${username}`);
-            }
-        }).catch((err) => {
-            console.log(err);
-            console.log(err.message);
-            console.log(err.response);
-            event_generation.createNewUiEvent(`error ${err.message} making login attempt`);
-        });
+    request.then((res) => {
+        console.log(res.text);
+        console.log(res.status);
+        console.log(res.headers);
+        staticResponse = res;
+        responseCookie = res.headers['set-cookie'];
+        session_state.saveAllCookiesFromSetCookie(responseCookie);
+        if (res.text.match('"errors": "None"')) {
+            event_generation.createNewUiEvent(`logged in as ${username}`);
+            event_generation.raiseAnyEvent(`loginEvent`, `${username}`);
+        }
+    }).catch((err) => {
+        console.log(err);
+        console.log(err.message);
+        console.log(err.response);
+        event_generation.createNewUiEvent(`error ${err.message} making login attempt`);
+    });
 }
 
 function getLoginFormDataString(username, password, csrfmiddlewaretoken, onetimecode) {
@@ -218,7 +229,14 @@ async function getUploadTokenResponse(returnToken) {
         upTokenReq = stat_agent.get('https://www.bitchute.com/myupload/');
         if (!settings.debugLocalApp) { uploadTokenRequestInProgress = true; }
         uploadTokenRequest = upTokenReq;
-        upTokenReq.buffer(true).withCredentials().set('Connection', 'keep-alive').redirects(2);
+        upTokenReq.buffer(true).withCredentials()
+            .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
+            .set('Host', 'www.bitchute.com')
+            .set('Accept-Encoding', 'gzip, deflate, br')
+            .set('Referer', 'https://www.bitchute.com/')
+            .set('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0')
+            .set('Connection', 'keep-alive')
+            .redirects(2);
         if (_vb_log) { console.log(upTokenReq); }
         if (!returnToken) {
             upTokenReq.then((res) => {
@@ -258,38 +276,38 @@ async function getUploadTokenResponse(returnToken) {
             });
         } else {
             var res = await upTokenReq;
-                uploadTokenRequestInProgress = false;
-                uploadTokenResponse = res.headers;
-                try {
-                    console.log(res.headers);
-                    console.log(upTokenReq.response.headers["location"]);
-                    console.log(upTokenReq.response.headers);
-                } catch{ }
-                try {
-                    console.log(res.status);
-                    console.log(res.text);
-                } catch { }
-                try {
-                    console.log(res.headers);
-                } catch (err) {
-                    event_generation.createNewUiEvent(`error ${err} getting upload token web response`);
-                }
-                latestVideoUploadCsrfToken = createDocument(res.text)
-                    .getElementById('fileupload').getAttribute('data-form-data').split('\"')[3];
-                event_generation.createNewUiEvent(`got upload token response for ${uploadLocation}`);
-                if (upTokenReq.url != null) {
-                    event_generation.raiseAnyEvent('uploadTokenEvent', null, upTokenReq.url);
-                    getUploadCodesFromUrlString(upTokenReq.url);
-                }
-                if (latestVideoUploadCsrfToken != '') {
-                    event_generation.raiseNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
+            uploadTokenRequestInProgress = false;
+            uploadTokenResponse = res.headers;
+            try {
+                console.log(res.headers);
+                console.log(upTokenReq.response.headers["location"]);
+                console.log(upTokenReq.response.headers);
+            } catch{ }
+            try {
+                console.log(res.status);
+                console.log(res.text);
+            } catch { }
+            try {
+                console.log(res.headers);
+            } catch (err) {
+                event_generation.createNewUiEvent(`error ${err} getting upload token web response`);
+            }
+            latestVideoUploadCsrfToken = createDocument(res.text)
+                .getElementById('fileupload').getAttribute('data-form-data').split('\"')[3];
+            event_generation.createNewUiEvent(`got upload token response for ${uploadLocation}`);
+            if (upTokenReq.url != null) {
+                event_generation.raiseAnyEvent('uploadTokenEvent', null, upTokenReq.url);
+                getUploadCodesFromUrlString(upTokenReq.url);
+            }
+            if (latestVideoUploadCsrfToken != '') {
+                event_generation.raiseNewProgressEvent(latestVideoUploadCsrfToken, 'csrfMiddleWareTokenTextBox');
             }
             return upTokenReq.url;
         }
     }
     if (upTokenReq != undefined && _vb_log) {
         console.log(upTokenReq);
-    } 
+    }
 }
 
 function getUploadCodesFromUrlString(qString) {
@@ -421,7 +439,7 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
             metapackage.jsonMeta.upload_code,
             metapackage.jsonMeta.cid,
             metapackage.jsonMeta.cdid,
-            metapackage.jsonMeta.sensitivity, 
+            metapackage.jsonMeta.sensitivity,
             metapackage.jsonMeta.publish_now,
             true,
             true);
@@ -430,6 +448,9 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
             .post(getEndpointForStep(simpleEndpoint, uploadType))
             .set('Host', uploadEndpointUrl.split("/")[2])
             .set('Referer', uploadEndpointUrl)
+            .set('Origin', 'https://' + uploadEndpointUrl.split("/")[2])
+            .set('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0')
+            .set('X-Requested-With', 'XMLHttpRequest')
             .set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
             .accept('*/*')
             .send(metastring)
@@ -448,10 +469,10 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
                     if (_vb_log) {
                         console.log(res);
                     }
-
+                    console.log('https://www.bitchute.com/video/' + uploadcode + '/');
                     getVidReq = stat_agent
                         .get('https://www.bitchute.com/video/' + uploadcode + '/')
-                        //.set('Connection', 'keep-alive')
+                        .set('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0')
                         .withCredentials()
                         .buffer(true).then((res) => {
                             responseCookie = res.headers['set-cookie'];
@@ -467,17 +488,10 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
                                 metapackage,
                                 generateCompletedUploadUrl(uploadcode));
                         }).catch((err) => {
+                            console.log(getVidReq)
                             console.log(err);
                             console.log(getVidReq);
                         });
-
-                    //event_generation.raiseAnyEvent('postingVideoFinalized', // @TODO remove
-                    //    'video posted successfully',
-                    //    {
-                    //        uploadTitle: metapackage.upload_title,
-                    //        uploadUrl: generateCompletedUploadUrl(uploadcode)
-                    //    },
-                    //    true);
                 } else {
                     console.log('error occured getting video path');
                     console.log(res);
@@ -500,7 +514,7 @@ function uploadVideoData(uploadEndpointUrl, localFilePath, csrfmwtoken, uploadco
             metapackage.jsonMetaVideoDetails.hashtags,
             metapackage.jsonMetaVideoDetails.category,
             metapackage.jsonMetaVideoDetails.sensitivity,
-            metapackage.jsonMetaVideoDetails.is_discussable, 
+            metapackage.jsonMetaVideoDetails.is_discussable,
             true);
         upVidReq = stat_agent
             .post(`https://www.bitchute.com/video/${uploadcode}/save/`)
@@ -549,8 +563,8 @@ function generateCompletedUploadUrl(uploadId) {
 }
 
 function getProgressPercent(bytesSent, byteTotal) {
-    if(vblog()){console.log(`bytes sent:${bytesSent} of bytes total:${byteTotal}`)}
-    return ((bytesSent/byteTotal)*100);
+    if (vblog()) { console.log(`bytes sent:${bytesSent} of bytes total:${byteTotal}`) }
+    return ((bytesSent / byteTotal) * 100);
 }
 
 function resetUploadValues() {
