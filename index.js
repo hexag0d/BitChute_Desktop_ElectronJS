@@ -5,3 +5,5 @@ const app_setting = require('./settings.js')
 
 
 lng_support.setLocalStrings(app_setting.getAppLanguageSetting); // set the strings to their localized form @TODO not all strings set
+
+//mark dirty for rebuild
