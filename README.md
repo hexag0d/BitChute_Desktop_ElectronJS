@@ -25,3 +25,4 @@ Devs cannot control what people post with this app.
 Special thanks to https://github.com/likethemammal/
 https://github.com/likethemammal/electron-ffmpeg-example for the ffmpeg integration template!  
 
+//recompile again
